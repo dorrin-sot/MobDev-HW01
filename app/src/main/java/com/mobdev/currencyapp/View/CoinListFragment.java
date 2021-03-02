@@ -8,11 +8,15 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.mobdev.currencyapp.Model.Coin;
 import com.mobdev.currencyapp.R;
+
+import java.util.List;
 
 import static com.mobdev.currencyapp.Model.Coin.getCoinList;
 
@@ -58,7 +62,9 @@ public class CoinListFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyCoinListRecyclerViewAdapter(getCoinList()));
+            List<Coin> coinList = getCoinList();
+            Log.i("coinList.size()", String.valueOf(coinList.size()));
+            recyclerView.setAdapter(new MyCoinListRecyclerViewAdapter(coinList));
         }
         return view;
     }

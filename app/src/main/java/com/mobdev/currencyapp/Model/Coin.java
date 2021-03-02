@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Coin {
+    static List<Coin> coinList = new LinkedList<>();
     private final String name, symbol;
     private final int id, rank;
     private final String logoURL;
@@ -33,11 +34,10 @@ public class Coin {
     }
 
     public static List<Coin> getCoinList() {
-        List<Coin> coinList = new LinkedList<>();
-
+        System.out.println("Coin.getCoinList");
         // fixme do from server now just test
         for (int i = 0; i < 5; i++)
-            coinList.add(new Coin("Bitcoin", "BTC", 1, i+1, "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
+            coinList.add(new Coin("Bitcoin", "BTC", 1, coinList.size()+1, "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
                     50000000, 0.025, -0.255, 0.664
             ));
 

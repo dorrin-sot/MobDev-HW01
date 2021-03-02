@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import com.mobdev.currencyapp.Model.Coin;
 import com.mobdev.currencyapp.R;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import static com.mobdev.currencyapp.Model.Coin.getCoinList;
@@ -62,9 +63,7 @@ public class CoinListFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            List<Coin> coinList = getCoinList();
-            Log.i("coinList.size()", String.valueOf(coinList.size()));
-            recyclerView.setAdapter(new MyCoinListRecyclerViewAdapter(coinList));
+            recyclerView.setAdapter(new MyCoinListRecyclerViewAdapter(new LinkedList<>()));
         }
         return view;
     }

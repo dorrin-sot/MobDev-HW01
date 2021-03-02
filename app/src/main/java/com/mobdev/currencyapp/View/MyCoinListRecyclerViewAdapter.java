@@ -12,7 +12,6 @@ import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.mobdev.currencyapp.Model.Coin;
-import com.mobdev.currencyapp.R;
 
 import java.text.DecimalFormat;
 import java.util.List;
@@ -29,11 +28,11 @@ import static java.lang.String.valueOf;
  */
 public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinListRecyclerViewAdapter.ViewHolder> {
 
-    private final List<Coin> mValues;
+    private final List<Coin> coins;
     private Context context;
 
-    public MyCoinListRecyclerViewAdapter(List<Coin> items) {
-        mValues = items;
+    public MyCoinListRecyclerViewAdapter(List<Coin> coins) {
+        this.coins = coins;
     }
 
     @Override
@@ -47,8 +46,8 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.coin = mValues.get(position);
-        Coin coin = mValues.get(position);
+        holder.coin = coins.get(position);
+        Coin coin = coins.get(position);
         holder.coinRank.setText(valueOf(coin.getRank()));
 //        holder.coinIcon.setImageIcon(createWithContentUri(valueOf(new File(coin.getLogoURL()).toURI()))); // fixme
 //        Glide.with(holder.mView)
@@ -85,7 +84,7 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
 
     @Override
     public int getItemCount() {
-        return mValues.size();
+        return coins.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -112,5 +111,9 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
             ((TextView) view.findViewById(id._1DTitle)).setText(context.getString(string._1DTitleStr));
             ((TextView) view.findViewById(id._1WTitle)).setText(context.getString(string._1WTitleStr));
         }
+    }
+
+    public List<Coin> getCoins() {
+        return coins;
     }
 }

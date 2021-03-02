@@ -44,6 +44,12 @@ public class Coin {
         return coinList;
     }
 
+    public static Coin getCoin(int id) {
+        return new Coin("Bitcoin", "BTC", id, coinList.size()+1, "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
+                50000000, 0.025, -0.255, 0.664
+        );
+    }
+
     public String getName() {
         return name;
     }

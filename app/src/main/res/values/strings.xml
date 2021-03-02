@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">Currency App</string>
+    <string name="refresh">refresh</string>
+    <string name="next">next</string>
+    <string name="previous">previous</string>
 </resources>

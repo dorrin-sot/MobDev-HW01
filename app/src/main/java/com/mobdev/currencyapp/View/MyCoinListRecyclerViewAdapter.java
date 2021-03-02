@@ -1,26 +1,25 @@
 package com.mobdev.currencyapp.View;
 
-import androidx.annotation.RequiresApi;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.annotation.SuppressLint;
-import android.graphics.drawable.Icon;
+import android.content.Context;
 import android.os.Build;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
+import androidx.annotation.RequiresApi;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.mobdev.currencyapp.Model.Coin;
 import com.mobdev.currencyapp.R;
 
-import java.io.File;
 import java.text.DecimalFormat;
 import java.util.List;
 
-import static android.graphics.drawable.Icon.createWithContentUri;
+import static android.view.LayoutInflater.from;
+import static androidx.core.content.ContextCompat.getColor;
+import static com.mobdev.currencyapp.R.*;
 import static java.lang.Math.abs;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
@@ -31,6 +30,7 @@ import static java.lang.String.valueOf;
 public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinListRecyclerViewAdapter.ViewHolder> {
 
     private final List<Coin> mValues;
+    private Context context;
 
     public MyCoinListRecyclerViewAdapter(List<Coin> items) {
         mValues = items;
@@ -38,15 +38,16 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.coin, parent, false);
+        View view = from(parent.getContext())
+                .inflate(layout.coin, parent, false);
+        context = parent.getContext();
         return new ViewHolder(view);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
+        holder.coin = mValues.get(position);
         Coin coin = mValues.get(position);
         holder.coinRank.setText(valueOf(coin.getRank()));
 //        holder.coinIcon.setImageIcon(createWithContentUri(valueOf(new File(coin.getLogoURL()).toURI()))); // fixme
@@ -57,8 +58,11 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
         holder.coinShortName.setText(coin.getSymbol());
         holder.coinPrice.setText(formatChange(coin.getCurrentPriceUSD(), 4));
         holder._1HChange.setText(formatChange(coin.getPercentChange1H(), 1));
+        holder._1HChange.setTextColor(getColorBaseOnUpDown(coin.getPercentChange1H()));
         holder._1DChange.setText(formatChange(coin.getPercentChange1D(), 2));
+        holder._1DChange.setTextColor(getColorBaseOnUpDown(coin.getPercentChange1D()));
         holder._1WChange.setText(formatChange(coin.getPercentChange1W(), 3));
+        holder._1WChange.setTextColor(getColorBaseOnUpDown(coin.getPercentChange1W()));
     }
 
     /**
@@ -67,26 +71,16 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
      */
     @SuppressLint("DefaultLocale")
     private String formatChange(double val, int type) {
-        String title;
-        switch (type) {
-            case 1:
-                title = "1H";
-                break;
-            case 2:
-                title = "1D";
-                break;
-            case 3:
-                title = "1W";
-                break;
-            case 4:
-            {
-                return format("$%s", new DecimalFormat("#,###.00").format(val));
-            }
-            default:
-                throw new IllegalStateException("Unexpected value: " + type);
-        }
+        if (type == 4)
+            return format("$%s", new DecimalFormat("#,###.00").format(val));
+
         boolean upOrDown = val > 0;
-        return format("%s: %s%.02f", title, upOrDown ? "⬆️" : "⬇️", Float.valueOf(valueOf(abs(val)))) + "%";
+        return format(" %s%.02f", upOrDown ? "▲️" : "▼️", Float.valueOf(valueOf(abs(val)))) + "%";
+    }
+
+    private int getColorBaseOnUpDown(double val) {
+        boolean upOrDown = val > 0;
+        return getColor(context, upOrDown ? color.up_green : color.down_red);
     }
 
     @Override
@@ -101,19 +95,22 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
                 coinPrice,
                 _1HChange, _1DChange, _1WChange;
         public final ImageView coinIcon;
-        public Coin mItem;
+        public Coin coin;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            coinRank = (TextView) view.findViewById(R.id.coinRank);
-            coinFullName = (TextView) view.findViewById(R.id.coinFullName);
-            coinShortName = view.findViewById(R.id.coinShortName);
-            coinIcon = view.findViewById(R.id.coinIcon);
-            coinPrice = view.findViewById(R.id.coinPrice);
-            _1HChange = view.findViewById(R.id._1HChange);
-            _1DChange = view.findViewById(R.id._1DChange);
-            _1WChange = view.findViewById(R.id._1WChange);
+            coinRank = (TextView) view.findViewById(id.coinRank);
+            coinFullName = (TextView) view.findViewById(id.coinFullName);
+            coinShortName = view.findViewById(id.coinShortName);
+            coinIcon = view.findViewById(id.coinIcon);
+            coinPrice = view.findViewById(id.coinPrice);
+            _1HChange = view.findViewById(id._1HChange);
+            _1DChange = view.findViewById(id._1DChange);
+            _1WChange = view.findViewById(id._1WChange);
+            ((TextView) view.findViewById(id._1HTitle)).setText(context.getString(string._1HTitleStr));
+            ((TextView) view.findViewById(id._1DTitle)).setText(context.getString(string._1DTitleStr));
+            ((TextView) view.findViewById(id._1WTitle)).setText(context.getString(string._1WTitleStr));
         }
     }
 }

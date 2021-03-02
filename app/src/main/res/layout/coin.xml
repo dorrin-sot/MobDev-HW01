@@ -68,9 +68,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:layout_marginLeft="7.5dp"
-            android:layout_marginTop="7.5dp"
-            android:layout_marginRight="7.5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="5dp"
             android:layout_marginBottom="2.5dp"
             android:textAlignment="center"
             android:textColor="#000000"
@@ -78,43 +78,84 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/_1HTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/coinPrice"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="2.5dp"
+            android:layout_marginBottom="5dp"
+            android:textAlignment="center"
+            android:textSize="12sp"
+            tools:text="@string/_1HTitleStr"/>
+
+        <TextView
             android:id="@+id/_1HChange"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/coinPrice"
-            android:layout_marginLeft="7.5dp"
             android:layout_marginTop="2.5dp"
-            android:layout_marginRight="7.5dp"
-            android:layout_marginBottom="7.5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_toEndOf="@id/_1HTitle"
             android:textAlignment="center"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:textStyle="bold"
+            tools:text="2" />
+
+        <TextView
+            android:id="@+id/_1DTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/coinPrice"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="2.5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_toEndOf="@id/_1HChange"
+            android:textAlignment="center"
+            android:textSize="12sp"
+            tools:text="@string/_1DTitleStr" />
 
         <TextView
             android:id="@+id/_1DChange"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/coinPrice"
-            android:layout_marginLeft="7.5dp"
             android:layout_marginTop="2.5dp"
-            android:layout_marginRight="7.5dp"
-            android:layout_marginBottom="7.5dp"
-            android:layout_toEndOf="@id/_1HChange"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_toEndOf="@id/_1DTitle"
             android:textAlignment="center"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:textStyle="bold"
+            tools:text="2" />
+
+        <TextView
+            android:id="@+id/_1WTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/coinPrice"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="2.5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_toEndOf="@id/_1DChange"
+            android:textAlignment="center"
+            android:textSize="12sp"
+            tools:text="@string/_1WTitleStr" />
 
         <TextView
             android:id="@+id/_1WChange"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/coinPrice"
-            android:layout_marginLeft="7.5dp"
             android:layout_marginTop="2.5dp"
-            android:layout_marginRight="7.5dp"
-            android:layout_marginBottom="7.5dp"
-            android:layout_toEndOf="@id/_1DChange"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_toEndOf="@id/_1WTitle"
             android:textAlignment="center"
             android:textSize="12sp"
-            tools:text="1W: 0.025%" />
+            android:textStyle="bold"
+            tools:text="2" />
     </RelativeLayout>
 
 </LinearLayout>

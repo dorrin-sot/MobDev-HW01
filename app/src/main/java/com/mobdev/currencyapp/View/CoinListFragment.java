@@ -12,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.mobdev.currencyapp.Model.Coin;
 import com.mobdev.currencyapp.R;
 
 import static com.mobdev.currencyapp.Model.Coin.getCoinList;
@@ -25,10 +24,6 @@ public class CoinListFragment extends Fragment {
     private static final String ARG_COLUMN_COUNT = "column-count";
     private int mColumnCount = 1;
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
     public CoinListFragment() {
     }
 

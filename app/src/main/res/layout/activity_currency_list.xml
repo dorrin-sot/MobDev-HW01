@@ -8,37 +8,40 @@
 
     <Button
         android:id="@+id/showPrevBtn"
-        android:layout_width="120dp"
+        android:layout_width="100dp"
         android:layout_height="0dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="10dp"
         android:onClick="prevPage"
         android:text="@string/previous"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/refreshBtn"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/showNextBtn"
-        android:layout_width="120dp"
+        android:layout_width="100dp"
         android:layout_height="0dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="10dp"
         android:onClick="nextPage"
         android:text="@string/next"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/refreshBtn" />
 
     <Button
         android:id="@+id/refreshBtn"
-        android:layout_width="120dp"
+        android:layout_width="100dp"
         android:layout_height="0dp"
         android:layout_marginBottom="10dp"
         android:onClick="refreshAndStartOver"
         android:text="@string/refresh"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/showNextBtn"
         app:layout_constraintStart_toEndOf="@+id/showPrevBtn" />

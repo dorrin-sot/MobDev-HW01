@@ -3,4 +3,7 @@
     <string name="refresh">refresh</string>
     <string name="next">next</string>
     <string name="previous">previous</string>
+    <string name="_1HTitleStr">1H:</string>
+    <string name="_1WTitleStr">1W:</string>
+    <string name="_1DTitleStr">1D:</string>
 </resources>

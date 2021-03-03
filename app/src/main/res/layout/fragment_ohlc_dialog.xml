@@ -30,14 +30,14 @@
 
     </com.google.android.material.tabs.TabLayout>
 
-    <com.github.mikephil.charting.charts.CandleStickChart
-        android:id="@+id/ohlcChart"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:layout_gravity="center"
+    <fragment
+        android:id="@+id/chartFragment"
+        android:name="com.mobdev.currencyapp.View.CandleStickChartFragment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginTop="60dp"
         android:layout_marginEnd="10dp"
-        android:layout_marginBottom="10dp" />
+        android:layout_marginBottom="10dp"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,25 +1,18 @@
 package com.mobdev.currencyapp.Model;
 
 import android.annotation.SuppressLint;
-import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
 import com.github.mikephil.charting.data.CandleEntry;
-import com.mobdev.currencyapp.R;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Random;
 
 import static android.os.Build.VERSION_CODES.O;
 import static java.lang.Math.random;
 import static java.lang.Math.toIntExact;
-import static java.lang.String.format;
-import static java.util.Arrays.sort;
 
 public class Coin {
     static LinkedList<Coin> coinList = new LinkedList<>();

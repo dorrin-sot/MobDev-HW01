@@ -7,9 +7,10 @@
     <string name="_1WTitleStr">1W:</string>
     <string name="_1DTitleStr">1D:</string>
     <string name="load_10_more">load 10 more</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="ohlcFrag">ohlc</string>
     <string name="past_week">past week</string>
     <string name="past_month">past month</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="chart">chart</string>
 </resources>

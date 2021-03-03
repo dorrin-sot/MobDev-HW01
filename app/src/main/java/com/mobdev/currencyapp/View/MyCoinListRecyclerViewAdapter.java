@@ -2,11 +2,9 @@ package com.mobdev.currencyapp.View;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.os.Message;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -14,9 +12,7 @@ import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.mobdev.currencyapp.Model.Coin;
-import com.mobdev.currencyapp.R;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
@@ -25,7 +21,11 @@ import static android.os.Build.VERSION_CODES.M;
 import static android.view.LayoutInflater.from;
 import static androidx.core.content.ContextCompat.getColor;
 import static com.mobdev.currencyapp.Model.Coin.clearCoinList;
-import static com.mobdev.currencyapp.R.*;
+import static com.mobdev.currencyapp.R.color;
+import static com.mobdev.currencyapp.R.drawable;
+import static com.mobdev.currencyapp.R.id;
+import static com.mobdev.currencyapp.R.layout;
+import static com.mobdev.currencyapp.R.string;
 import static com.mobdev.currencyapp.View.CurrencyListActivity.getHandler;
 import static com.mobdev.currencyapp.View.CurrencyListActivity.openOhlcPage;
 import static java.lang.Math.abs;
@@ -146,7 +146,6 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
             Message msg = new Message();
             msg.what = openOhlcPage;
             msg.obj = coin;
-            msg.arg1 = 7;
             getHandler().sendMessage(msg);
         }
     }

@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 
 import com.mobdev.currencyapp.Model.Coin;
 import com.mobdev.currencyapp.R;
@@ -20,6 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static com.mobdev.currencyapp.Model.Coin.getCoinList;
+import static com.mobdev.currencyapp.R.*;
 
 /**
  * A fragment representing a list of Items.
@@ -52,7 +54,7 @@ public class CoinListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.coin_list, container, false);
+        View view = inflater.inflate(layout.coin_list, container, false);
 
         // Set the adapter
         if (view instanceof RecyclerView) {
@@ -63,7 +65,7 @@ public class CoinListFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyCoinListRecyclerViewAdapter(new LinkedList<>()));
+            recyclerView.setAdapter(new MyCoinListRecyclerViewAdapter());
         }
         return view;
     }

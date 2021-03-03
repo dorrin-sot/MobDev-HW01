@@ -14,8 +14,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.mobdev.currencyapp.Model.Coin;
 
 import java.text.DecimalFormat;
+import java.util.LinkedList;
 import java.util.List;
 
+import static android.os.Build.VERSION_CODES.M;
 import static android.view.LayoutInflater.from;
 import static androidx.core.content.ContextCompat.getColor;
 import static com.mobdev.currencyapp.R.*;
@@ -28,11 +30,36 @@ import static java.lang.String.valueOf;
  */
 public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinListRecyclerViewAdapter.ViewHolder> {
 
-    private final List<Coin> coins;
+    private static final LinkedList<Coin> coins = new LinkedList<>();
+    static Thread coinListObserver;
     private Context context;
 
-    public MyCoinListRecyclerViewAdapter(List<Coin> coins) {
-        this.coins = coins;
+    public MyCoinListRecyclerViewAdapter() {
+        coinListObserver = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    try {
+                        System.out.println("MyCoinListRecyclerViewAdapter.run.before wait");
+                        synchronized (this) {
+                            wait();
+                            notifyItemInserted(coins.size() - 1);
+                        }
+                        System.out.println("MyCoinListRecyclerViewAdapter.run.after wait");
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        coinListObserver.start();
+    }
+
+    public static void refreshCoinList() {
+        synchronized (coinListObserver) {
+            coins.clear();
+            coinListObserver.notify();
+        }
     }
 
     @Override
@@ -43,7 +70,7 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
         return new ViewHolder(view);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
+    @RequiresApi(api = M)
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.coin = coins.get(position);
@@ -99,8 +126,8 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            coinRank = (TextView) view.findViewById(id.coinRank);
-            coinFullName = (TextView) view.findViewById(id.coinFullName);
+            coinRank = view.findViewById(id.coinRank);
+            coinFullName = view.findViewById(id.coinFullName);
             coinShortName = view.findViewById(id.coinShortName);
             coinIcon = view.findViewById(id.coinIcon);
             coinPrice = view.findViewById(id.coinPrice);
@@ -113,7 +140,15 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
         }
     }
 
-    public List<Coin> getCoins() {
+    public static void addCoinObj(Coin coin) {
+        synchronized (coinListObserver) {
+            System.out.println("MyCoinListRecyclerViewAdapter.addCoinObj");
+            coins.addLast(coin);
+            coinListObserver.notifyAll();
+        }
+    }
+
+    public static LinkedList<Coin> getCoins() {
         return coins;
     }
 }

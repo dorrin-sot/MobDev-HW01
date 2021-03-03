@@ -1,17 +1,24 @@
 package com.mobdev.currencyapp.View;
 
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
+import android.view.View;
 import android.widget.ProgressBar;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.mobdev.currencyapp.Model.Coin;
+import com.mobdev.currencyapp.OhlcDialog;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -21,13 +28,14 @@ import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 import static androidx.recyclerview.widget.DividerItemDecoration.VERTICAL;
 import static com.mobdev.currencyapp.Model.Coin.getCoin;
+import static com.mobdev.currencyapp.OhlcDialog.newInstance;
 import static com.mobdev.currencyapp.R.id;
 import static com.mobdev.currencyapp.R.layout;
 import static com.mobdev.currencyapp.View.MyCoinListRecyclerViewAdapter.getCoins;
 
 public class CurrencyListActivity extends AppCompatActivity {
-    Handler handler = new Handler();
-    final int loadCoins = 1;
+    static Handler handler = new Handler();
+    public static final int loadCoins = 1, openOhlcPage = 2;
 
     ThreadPoolExecutor executor;
 
@@ -69,27 +77,44 @@ public class CurrencyListActivity extends AppCompatActivity {
         super.onResume();
         handler = new Handler(Looper.getMainLooper(), msg -> {
             switch (msg.what) {
-                case loadCoins:
+                case loadCoins: {
                     int start = msg.arg1, num = msg.arg2, end = start + num;
                     runOnUiThread(() -> {
-                         ProgressBar progressBar = findViewById(id.loadingProgressBar);
-                         progressBar.setProgress(0, true);
-                         progressBar.setMax(num);
-                         progressBar.setVisibility(VISIBLE);
+                        ProgressBar progressBar = findViewById(id.loadingProgressBar);
+                        progressBar.setProgress(0, true);
+                        progressBar.setMax(num);
+                        progressBar.setVisibility(VISIBLE);
                     });
                     for (int id = start; id < end; id++) {
                         int finalId = id;
                         executor.execute(() -> {
                             Coin coin = getCoin(finalId);
-                            System.out.println("S" + finalId);
                             runOnUiThread(() -> {
                                 adapter.addCoinObj(coin);
                                 addProgress();
                             });
-                            System.out.println("E" + finalId);
                         });
                     }
-                    break;
+                }
+                break;
+                case openOhlcPage: {
+                    Coin coin = (Coin) msg.obj;
+                    int clickedID = msg.arg1;
+                    // todo get ohlc data to display
+                    FragmentTransaction ft = getFragmentManager().beginTransaction();
+                    Fragment prev = getFragmentManager().findFragmentById(id.ohlcDialogFragment);
+                    if (prev != null) {
+                        ft.remove(prev);
+                    }
+                    ft.addToBackStack(null);
+
+                    // Create and show the dialog.
+                    DialogFragment newFragment = newInstance(coin.getId());
+                    newFragment.show(getSupportFragmentManager(), "ohlc");
+                }
+                break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + msg.what);
             }
             return true;
         });
@@ -102,10 +127,14 @@ public class CurrencyListActivity extends AppCompatActivity {
 
         progressBar.setProgress(progressBar.getProgress() + 1, true);
 
-        if (progressBar.getProgress() == progressBar.getMax()-1) {
+        if (progressBar.getProgress() == progressBar.getMax() - 1) {
             progressBar.setVisibility(INVISIBLE);
             progressBar.setProgress(0, false);
             System.out.println(progressBar.getProgress() + ", " + progressBar.getMax());
         }
+    }
+
+    public static Handler getHandler() {
+        return handler;
     }
 }

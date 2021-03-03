@@ -3,8 +3,10 @@ package com.mobdev.currencyapp.View;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.os.Message;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -24,6 +26,8 @@ import static android.view.LayoutInflater.from;
 import static androidx.core.content.ContextCompat.getColor;
 import static com.mobdev.currencyapp.Model.Coin.clearCoinList;
 import static com.mobdev.currencyapp.R.*;
+import static com.mobdev.currencyapp.View.CurrencyListActivity.getHandler;
+import static com.mobdev.currencyapp.View.CurrencyListActivity.openOhlcPage;
 import static java.lang.Math.abs;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
@@ -82,7 +86,7 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
                 //.load(mImageUri) // Load image from assets
                 .load(coin.getLogoURL()) // Image URL
                 .centerCrop() // Image scale type
-                .override(100,100) // Resize image
+                .override(100, 100) // Resize image
                 .placeholder(drawable.coin_icon) // Place holder image
                 .into(coinIcon); // ImageView to display image
     }
@@ -110,7 +114,7 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
         return coins.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public final View mView;
         public final TextView coinRank,
                 coinFullName, coinShortName,
@@ -133,6 +137,17 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
             ((TextView) view.findViewById(id._1HTitle)).setText(context.getString(string._1HTitleStr));
             ((TextView) view.findViewById(id._1DTitle)).setText(context.getString(string._1DTitleStr));
             ((TextView) view.findViewById(id._1WTitle)).setText(context.getString(string._1WTitleStr));
+            view.setOnClickListener(this);
+        }
+
+
+        @Override
+        public void onClick(View v) {
+            Message msg = new Message();
+            msg.what = openOhlcPage;
+            msg.obj = coin;
+            msg.arg1 = v.getId();
+            getHandler().sendMessage(msg);
         }
     }
 

@@ -146,7 +146,7 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
             Message msg = new Message();
             msg.what = openOhlcPage;
             msg.obj = coin;
-            msg.arg1 = v.getId();
+            msg.arg1 = 7;
             getHandler().sendMessage(msg);
         }
     }

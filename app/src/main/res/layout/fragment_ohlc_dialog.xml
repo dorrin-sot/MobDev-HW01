@@ -1,16 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     android:id="@+id/ohlcDialogFragment"
+    android:layout_width="350dp"
+    android:layout_height="500dp"
     android:tag="@string/ohlcFrag"
-    tools:context=".OhlcDialog">
+    tools:context=".View.OhlcDialog">
 
-    <TextView
+    <com.google.android.material.tabs.TabLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/show1WTab"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:onClick="showOHLC"
+            android:text="@string/past_week"
+            tools:ignore="OnClick" />
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/show1MTab"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:onClick="showOHLC"
+            tools:ignore="OnClick" />
+
+    </com.google.android.material.tabs.TabLayout>
+
+    <com.github.mikephil.charting.charts.CandleStickChart
+        android:id="@+id/ohlcChart"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/coinIDTextView"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_gravity="center"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp" />
 
-</FrameLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

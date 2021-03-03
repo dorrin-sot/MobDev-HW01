@@ -2,15 +2,17 @@ package com.mobdev.currencyapp.View;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.view.ContextMenu;
-import android.view.MenuInflater;
+import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
@@ -18,17 +20,20 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.mobdev.currencyapp.Model.Coin;
-import com.mobdev.currencyapp.OhlcDialog;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static android.os.Build.VERSION_CODES.N;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 import static androidx.recyclerview.widget.DividerItemDecoration.VERTICAL;
 import static com.mobdev.currencyapp.Model.Coin.getCoin;
-import static com.mobdev.currencyapp.OhlcDialog.newInstance;
+import static com.mobdev.currencyapp.View.OhlcDialog.getCoinID;
+import static com.mobdev.currencyapp.View.OhlcDialog.newInstance;
 import static com.mobdev.currencyapp.R.id;
 import static com.mobdev.currencyapp.R.layout;
 import static com.mobdev.currencyapp.View.MyCoinListRecyclerViewAdapter.getCoins;
@@ -99,17 +104,25 @@ public class CurrencyListActivity extends AppCompatActivity {
                 break;
                 case openOhlcPage: {
                     Coin coin = (Coin) msg.obj;
-                    int clickedID = msg.arg1;
-                    // todo get ohlc data to display
+                    int numberOfDays = msg.arg1;
+                    AtomicReference<HashMap<Integer, String>> ohlcData = new AtomicReference<>();
+                    Thread thread = new Thread(() -> ohlcData.set(coin.getOHLCData(numberOfDays)));
+                    executor.execute(thread);
+
                     FragmentTransaction ft = getFragmentManager().beginTransaction();
                     Fragment prev = getFragmentManager().findFragmentById(id.ohlcDialogFragment);
-                    if (prev != null) {
+                    if (prev != null)
                         ft.remove(prev);
-                    }
                     ft.addToBackStack(null);
 
                     // Create and show the dialog.
-                    DialogFragment newFragment = newInstance(coin.getId());
+                    try {
+                        thread.join();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println("done");
+                    DialogFragment newFragment = newInstance(coin.getId(), ohlcData.get());
                     newFragment.show(getSupportFragmentManager(), "ohlc");
                 }
                 break;
@@ -118,6 +131,16 @@ public class CurrencyListActivity extends AppCompatActivity {
             }
             return true;
         });
+    }
+
+    public void showOHLC(View v) {
+        if (!v.isSelected()) {
+            Message message = new Message();
+            message.what = openOhlcPage;
+            message.arg1 = (v.getId() == id.show1WTab ? 7 : 30);
+            message.obj = getCoinID();
+            getHandler().sendMessage(message);
+        }
     }
 
     @RequiresApi(api = N)

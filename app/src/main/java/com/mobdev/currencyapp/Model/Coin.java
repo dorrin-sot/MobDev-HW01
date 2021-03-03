@@ -1,7 +1,14 @@
 package com.mobdev.currencyapp.Model;
 
+import android.annotation.SuppressLint;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
+import java.util.Random;
+
+import static java.lang.String.format;
+import static java.util.Arrays.sort;
 
 public class Coin {
     static LinkedList<Coin> coinList = new LinkedList<>();
@@ -33,19 +40,9 @@ public class Coin {
         this.percentChange1W = percentChange1W;
     }
 
-    public static LinkedList<Coin> getCoinList() {
-        System.out.println("Coin.getCoinList");
-        // fixme do from server now just test
-        for (int i = 0; i < 5; i++)
-            coinList.add(new Coin("Bitcoin", "BTC", 1, coinList.size()+1, "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
-                    50000000, 0.025, -0.255, 0.664
-            ));
-
-        return coinList;
-    }
-
     public static synchronized Coin getCoin(int id) {
-        coinList.addLast(new Coin("Bitcoin", "BTC", id, coinList.size()+1, "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
+        // fixme do from server now just test
+        coinList.addLast(new Coin("Bitcoin", "BTC", id, coinList.size() + 1, "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
                 50000000, 0.025, -0.255, 0.664
         ));
         return coinList.getLast();
@@ -53,6 +50,37 @@ public class Coin {
 
     public static synchronized void clearCoinList() {
         coinList = new LinkedList<>();
+    }
+
+    public synchronized HashMap<Integer, String> getOHLCData(int numberOfDays) {
+        HashMap<Integer, String> ohlcData = new HashMap<>();
+
+        // fixme do from server now just test
+        switch (numberOfDays) {
+            case 7:
+            case 30:
+                for (int day = 1; day <= numberOfDays; day++)
+                    ohlcData.put(day, generateRandomOHLCData());
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + numberOfDays);
+        }
+
+        return ohlcData;
+    }
+
+    // todo only for testing
+    @SuppressLint("DefaultLocale")
+    private static String generateRandomOHLCData() {
+        int[] numbers = new int[4];
+        for (int i = 0; i < 4; i++)
+            numbers[i] = new Random().nextInt(60_000);
+        sort(numbers);
+        int open = numbers[2],
+                high = numbers[0],
+                low = numbers[3],
+                close = numbers[1];
+        return format("%d,%d,%d,%d", open, high, low, close);
     }
 
     public String getName() {

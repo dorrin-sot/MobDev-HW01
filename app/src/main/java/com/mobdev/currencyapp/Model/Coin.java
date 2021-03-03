@@ -70,13 +70,6 @@ public class Coin {
 
         ArrayList<CandleEntry> values = new ArrayList<>();
 
-//        values.add(new CandleEntry(values.size(), 4.62f, 2.02f, 2.70f, 4.13f));
-//        values.add(new CandleEntry(values.size(), 5.50f, 2.70f, 3.35f, 4.96f));
-//        values.add(new CandleEntry(values.size(), 5.25f, 3.02f, 3.50f, 4.50f));
-//        values.add(new CandleEntry(values.size(), 6f, 3.25f, 4.40f, 5.0f));
-//        values.add(new CandleEntry(values.size(), 5.57f, 2f, 2.80f, 4.5f));
-//        values.add(new CandleEntry(values.size(), 4.62f, 2.02f, 2.70f, 4.13f));
-
         for (int i = toIntExact(end.toEpochDay() - 1); i >= toIntExact(start.toEpochDay()); i--) {
             float multi = (100 + 1);
             float val = (float) (random() * 40) + multi;

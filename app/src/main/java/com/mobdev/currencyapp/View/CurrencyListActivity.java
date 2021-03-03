@@ -104,6 +104,7 @@ public class CurrencyListActivity extends AppCompatActivity {
                 case openOhlcPage: {
                     Coin coin = (Coin) msg.obj;
                     int numberOfDays = msg.arg1;
+                    System.out.println("show ohlc message received -> numberOfDays=" + numberOfDays);
                     executor.execute(() -> {
                         LocalDate date = now().minusDays(numberOfDays);
                         ArrayList<CandleEntry> ohlcData = coin.generateRandomOHLCData(date, now());

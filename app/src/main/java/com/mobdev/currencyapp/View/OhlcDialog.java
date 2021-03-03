@@ -17,8 +17,10 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.CandleData;
 import com.github.mikephil.charting.data.CandleDataSet;
 import com.github.mikephil.charting.data.CandleEntry;
+import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayout.Tab;
+import com.mobdev.currencyapp.Model.Coin;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -32,6 +34,7 @@ import static android.os.Build.VERSION_CODES.O;
 import static androidx.core.content.ContextCompat.getColor;
 import static com.github.mikephil.charting.components.XAxis.XAxisPosition.BOTH_SIDED;
 import static com.github.mikephil.charting.components.YAxis.AxisDependency.LEFT;
+import static com.mobdev.currencyapp.Model.Coin.getCoin;
 import static com.mobdev.currencyapp.R.*;
 import static com.mobdev.currencyapp.View.CurrencyListActivity.getHandler;
 import static com.mobdev.currencyapp.View.CurrencyListActivity.openOhlcPage;
@@ -49,6 +52,8 @@ public class OhlcDialog extends DialogFragment implements TabLayout.OnTabSelecte
     private static final String ohlcDataArg = "ohlcData",
             coinIDArg = "coinID";
     private static int coinID;
+
+    private TabLayout tabLayout;
 
     public OhlcDialog() {
     }
@@ -80,33 +85,40 @@ public class OhlcDialog extends DialogFragment implements TabLayout.OnTabSelecte
                              Bundle savedInstanceState) {
         View view = inflater.inflate(layout.fragment_ohlc_dialog, container, false);
 
+        tabLayout = view.findViewById(id.tabLayout);
+
+        tabLayout.addOnTabSelectedListener(this);
+
         CandleStickChart chart = view.findViewById(id.ohlcChart);
-        chart.setMaxVisibleValueCount(30);
+        chart.setMaxVisibleValueCount(32);
         chart.getDescription().setEnabled(false);
         chart.setBackgroundColor(WHITE);
         chart.setPinchZoom(false);
-        chart.setDrawGridBackground(true);
+        chart.setDrawGridBackground(false);
 
         XAxis xAxis = chart.getXAxis();
         xAxis.setPosition(BOTH_SIDED);
         xAxis.setDrawAxisLine(true);
-//        xAxis.setDrawGridLinesBehindData(true);
+        xAxis.setDrawGridLinesBehindData(true);
 
         YAxis yAxis = chart.getAxisLeft();
         yAxis.setDrawAxisLine(true);
 //        yAxis.setAxisMaximum(60_000);
 //        yAxis.setAxisMinimum(0);
         yAxis.setEnabled(true);
-//        yAxis.setDrawGridLinesBehindData(true);
+        yAxis.setDrawGridLinesBehindData(true);
 
         yAxis = chart.getAxisRight();
         yAxis.setDrawAxisLine(true);
 //        yAxis.setAxisMaximum(60_000);
 //        yAxis.setAxisMinimum(0);
         yAxis.setEnabled(true);
-//        yAxis.setDrawGridLinesBehindData(true);
+        yAxis.setDrawGridLinesBehindData(true);
 
         chart.resetTracking();
+
+        tabLayout.getTabAt(ohlcData.size() == 7 ? 0 : 1)
+                .select();
 
         CandleDataSet candleDataSet = new CandleDataSet(ohlcData, "DataSet");
 
@@ -141,7 +153,7 @@ public class OhlcDialog extends DialogFragment implements TabLayout.OnTabSelecte
         Message message = new Message();
         message.what = openOhlcPage;
         message.arg1 = (tab.getId() == id.show1WTab ? 7 : 30);
-        message.obj = getCoinID();
+        message.obj = getCoin(getCoinID());
         getHandler().sendMessage(message);
     }
 

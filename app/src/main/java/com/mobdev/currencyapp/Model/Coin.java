@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Coin {
-    static List<Coin> coinList = new LinkedList<>();
+    static LinkedList<Coin> coinList = new LinkedList<>();
     private final String name, symbol;
     private final int id, rank;
     private final String logoURL;
@@ -33,7 +33,7 @@ public class Coin {
         this.percentChange1W = percentChange1W;
     }
 
-    public static List<Coin> getCoinList() {
+    public static LinkedList<Coin> getCoinList() {
         System.out.println("Coin.getCoinList");
         // fixme do from server now just test
         for (int i = 0; i < 5; i++)
@@ -44,10 +44,15 @@ public class Coin {
         return coinList;
     }
 
-    public static Coin getCoin(int id) {
-        return new Coin("Bitcoin", "BTC", id, coinList.size()+1, "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
+    public static synchronized Coin getCoin(int id) {
+        coinList.addLast(new Coin("Bitcoin", "BTC", id, coinList.size()+1, "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
                 50000000, 0.025, -0.255, 0.664
-        );
+        ));
+        return coinList.getLast();
+    }
+
+    public static synchronized void clearCoinList() {
+        coinList = new LinkedList<>();
     }
 
     public String getName() {

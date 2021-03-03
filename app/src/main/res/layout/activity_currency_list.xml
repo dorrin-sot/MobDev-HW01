@@ -42,9 +42,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <fragment
-        android:id="@+id/fragment"
-        android:name="com.mobdev.currencyapp.View.CoinListFragment"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/coinRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="5dp"
@@ -54,5 +53,8 @@
         app:layout_constraintBottom_toTopOf="@+id/loadingProgressBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layoutManager="LinearLayoutManager"
+        android:isScrollContainer="true"
+        tools:listitem="@layout/coin" />
 </androidx.constraintlayout.widget.ConstraintLayout>

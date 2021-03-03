@@ -2,7 +2,6 @@ package com.mobdev.currencyapp.View;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -14,12 +13,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.mobdev.currencyapp.Model.Coin;
 
 import java.text.DecimalFormat;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
 
 import static android.os.Build.VERSION_CODES.M;
 import static android.view.LayoutInflater.from;
 import static androidx.core.content.ContextCompat.getColor;
+import static com.mobdev.currencyapp.Model.Coin.clearCoinList;
 import static com.mobdev.currencyapp.R.*;
 import static java.lang.Math.abs;
 import static java.lang.String.format;
@@ -30,35 +29,17 @@ import static java.lang.String.valueOf;
  */
 public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinListRecyclerViewAdapter.ViewHolder> {
 
-    private static final LinkedList<Coin> coins = new LinkedList<>();
-    static Thread coinListObserver;
+    private static HashMap<Integer, Coin> coins = new HashMap<>();
     private Context context;
 
     public MyCoinListRecyclerViewAdapter() {
-        coinListObserver = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-                        System.out.println("MyCoinListRecyclerViewAdapter.run.before wait");
-                        synchronized (this) {
-                            wait();
-                            notifyItemInserted(coins.size() - 1);
-                        }
-                        System.out.println("MyCoinListRecyclerViewAdapter.run.after wait");
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
-        coinListObserver.start();
     }
 
-    public static void refreshCoinList() {
-        synchronized (coinListObserver) {
-            coins.clear();
-            coinListObserver.notify();
+    public synchronized void refreshCoinList() {
+        clearCoinList();
+        coins = new HashMap<>();
+        for (int i = 0; i < coins.size(); i++) {
+            notifyItemRemoved(0);
         }
     }
 
@@ -73,8 +54,12 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
     @RequiresApi(api = M)
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.coin = coins.get(position);
+        if (coins.isEmpty()) return;
+        position++;
         Coin coin = coins.get(position);
+        if (coin == null) return;
+        System.out.println(position + " " + coin + " " + coin.getRank());
+        holder.coin = coin;
         holder.coinRank.setText(valueOf(coin.getRank()));
 //        holder.coinIcon.setImageIcon(createWithContentUri(valueOf(new File(coin.getLogoURL()).toURI()))); // fixme
 //        Glide.with(holder.mView)
@@ -140,15 +125,12 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
         }
     }
 
-    public static void addCoinObj(Coin coin) {
-        synchronized (coinListObserver) {
-            System.out.println("MyCoinListRecyclerViewAdapter.addCoinObj");
-            coins.addLast(coin);
-            coinListObserver.notifyAll();
-        }
+    public synchronized void addCoinObj(Coin coin) {
+        coins.put(coin.getRank(), coin);
+        notifyItemChanged(coin.getRank() - 1);
     }
 
-    public static LinkedList<Coin> getCoins() {
+    public static synchronized HashMap<Integer, Coin> getCoins() {
         return coins;
     }
 }

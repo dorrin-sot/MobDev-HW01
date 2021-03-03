@@ -9,6 +9,7 @@ import androidx.annotation.RequiresApi;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,8 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.CandleData;
 import com.github.mikephil.charting.data.CandleDataSet;
 import com.github.mikephil.charting.data.CandleEntry;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayout.Tab;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -29,10 +32,13 @@ import java.util.stream.Stream;
 
 import static android.graphics.Color.WHITE;
 import static android.graphics.Paint.Style.FILL;
+import static android.os.Build.VERSION_CODES.O;
 import static androidx.core.content.ContextCompat.getColor;
 import static com.github.mikephil.charting.components.XAxis.XAxisPosition.BOTH_SIDED;
 import static com.github.mikephil.charting.components.YAxis.AxisDependency.LEFT;
 import static com.mobdev.currencyapp.R.*;
+import static com.mobdev.currencyapp.View.CurrencyListActivity.getHandler;
+import static com.mobdev.currencyapp.View.CurrencyListActivity.openOhlcPage;
 import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
 import static java.time.LocalDate.now;
@@ -42,7 +48,7 @@ import static java.time.LocalDate.now;
  * Use the {@link OhlcDialog#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class OhlcDialog extends DialogFragment {
+public class OhlcDialog extends DialogFragment implements TabLayout.OnTabSelectedListener {
     private static HashMap<LocalDate, String> ohlcData;
     private static final String ohlcDataArg = "ohlcData",
             coinIDArg = "coinID";
@@ -52,7 +58,6 @@ public class OhlcDialog extends DialogFragment {
     }
 
     /**
-     * @param ohlcData
      * @return A new instance of fragment OhlcDialog.
      */
     public static OhlcDialog newInstance(int coinID, HashMap<LocalDate, String> ohlcData) {
@@ -73,7 +78,7 @@ public class OhlcDialog extends DialogFragment {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    @RequiresApi(api = O)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -105,6 +110,8 @@ public class OhlcDialog extends DialogFragment {
         yAxis.setEnabled(true);
 //        yAxis.setDrawGridLinesBehindData(true);
 
+        chart.resetTracking();
+
         CandleDataSet candleDataSet = getCandleDataSet(ohlcData);
 
         candleDataSet.setDrawIcons(false);
@@ -124,7 +131,7 @@ public class OhlcDialog extends DialogFragment {
         return view;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    @RequiresApi(api = O)
     private static CandleDataSet getCandleDataSet(HashMap<LocalDate, String> ohlcData) {
         return new CandleDataSet(new LinkedList<CandleEntry>() {{
             for (Map.Entry<LocalDate, String> pieceOfData : ohlcData.entrySet()) {
@@ -147,5 +154,22 @@ public class OhlcDialog extends DialogFragment {
 
     public static int getCoinID() {
         return coinID;
+    }
+
+    @Override
+    public void onTabSelected(Tab tab) {
+        Message message = new Message();
+        message.what = openOhlcPage;
+        message.arg1 = (tab.getId() == id.show1WTab ? 7 : 30);
+        message.obj = getCoinID();
+        getHandler().sendMessage(message);
+    }
+
+    @Override
+    public void onTabUnselected(Tab tab) {
+    }
+
+    @Override
+    public void onTabReselected(Tab tab) {
     }
 }

@@ -131,16 +131,6 @@ public class CurrencyListActivity extends AppCompatActivity {
         });
     }
 
-    public void showOHLC(View v) {
-        if (!v.isSelected()) {
-            Message message = new Message();
-            message.what = openOhlcPage;
-            message.arg1 = (v.getId() == id.show1WTab ? 7 : 30);
-            message.obj = getCoinID();
-            getHandler().sendMessage(message);
-        }
-    }
-
     @RequiresApi(api = N)
     synchronized void addProgress() {
         ProgressBar progressBar = findViewById(id.loadingProgressBar);

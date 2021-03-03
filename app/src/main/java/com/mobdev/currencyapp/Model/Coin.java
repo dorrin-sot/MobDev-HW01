@@ -2,6 +2,8 @@ package com.mobdev.currencyapp.Model;
 
 import android.annotation.SuppressLint;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -52,26 +54,14 @@ public class Coin {
         coinList = new LinkedList<>();
     }
 
-    public synchronized HashMap<Integer, String> getOHLCData(int numberOfDays) {
-        HashMap<Integer, String> ohlcData = new HashMap<>();
-
+    public synchronized String getOHLCData(LocalDate day) {
         // fixme do from server now just test
-        switch (numberOfDays) {
-            case 7:
-            case 30:
-                for (int day = 1; day <= numberOfDays; day++)
-                    ohlcData.put(day, generateRandomOHLCData());
-                break;
-            default:
-                throw new IllegalStateException("Unexpected value: " + numberOfDays);
-        }
-
-        return ohlcData;
+        return generateRandomOHLCData(day);
     }
 
     // todo only for testing
     @SuppressLint("DefaultLocale")
-    private static String generateRandomOHLCData() {
+    private static String generateRandomOHLCData(LocalDate day) {
         int[] numbers = new int[4];
         for (int i = 0; i < 4; i++)
             numbers[i] = new Random().nextInt(60_000);

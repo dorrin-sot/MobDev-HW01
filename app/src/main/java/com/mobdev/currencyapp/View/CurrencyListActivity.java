@@ -8,6 +8,7 @@ import android.widget.ProgressBar;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.mobdev.currencyapp.Model.Coin;
@@ -18,6 +19,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import static android.os.Build.VERSION_CODES.N;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
+import static androidx.recyclerview.widget.DividerItemDecoration.VERTICAL;
 import static com.mobdev.currencyapp.Model.Coin.getCoin;
 import static com.mobdev.currencyapp.R.id;
 import static com.mobdev.currencyapp.R.layout;
@@ -42,6 +44,7 @@ public class CurrencyListActivity extends AppCompatActivity {
         executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(5);
         recyclerView = findViewById(id.coinRecyclerView);
         recyclerView.setAdapter(new MyCoinListRecyclerViewAdapter());
+        recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), VERTICAL));
         adapter = (MyCoinListRecyclerViewAdapter) recyclerView.getAdapter();
 
         refreshAndStartOver();
@@ -68,16 +71,22 @@ public class CurrencyListActivity extends AppCompatActivity {
             switch (msg.what) {
                 case loadCoins:
                     int start = msg.arg1, num = msg.arg2, end = start + num;
-                    for (int id = start; id <= end; id++) {
+                    runOnUiThread(() -> {
+                         ProgressBar progressBar = findViewById(id.loadingProgressBar);
+                         progressBar.setProgress(0, true);
+                         progressBar.setMax(num);
+                         progressBar.setVisibility(VISIBLE);
+                    });
+                    for (int id = start; id < end; id++) {
                         int finalId = id;
                         executor.execute(() -> {
                             Coin coin = getCoin(finalId);
-                            System.out.println("S" + getCoins().size());
+                            System.out.println("S" + finalId);
                             runOnUiThread(() -> {
                                 adapter.addCoinObj(coin);
-                                addProgress(finalId - start, num);
+                                addProgress();
                             });
-                            System.out.println("E" + getCoins().size());
+                            System.out.println("E" + finalId);
                         });
                     }
                     break;
@@ -87,17 +96,16 @@ public class CurrencyListActivity extends AppCompatActivity {
     }
 
     @RequiresApi(api = N)
-    synchronized void addProgress(int doneCount, int allCount) {
+    synchronized void addProgress() {
         ProgressBar progressBar = findViewById(id.loadingProgressBar);
-        if (progressBar.getMax() != allCount)
-            progressBar.setMax(allCount);
+        System.out.println(progressBar.getProgress() + ", " + progressBar.getMax());
 
-        if (progressBar.getVisibility() == INVISIBLE)
-            progressBar.setVisibility(VISIBLE);
-        progressBar.setProgress(doneCount, true);
-        if (doneCount + 1 > progressBar.getMax()) {
+        progressBar.setProgress(progressBar.getProgress() + 1, true);
+
+        if (progressBar.getProgress() == progressBar.getMax()-1) {
             progressBar.setVisibility(INVISIBLE);
             progressBar.setProgress(0, false);
+            System.out.println(progressBar.getProgress() + ", " + progressBar.getMax());
         }
     }
 }

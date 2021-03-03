@@ -38,6 +38,7 @@
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="5dp"
+        android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/refreshBtn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -56,5 +57,5 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layoutManager="LinearLayoutManager"
         android:isScrollContainer="true"
-        tools:listitem="@layout/coin" />
+        tools:listitem="@layout/coin"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

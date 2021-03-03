@@ -2,6 +2,7 @@ package com.mobdev.currencyapp.View;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -10,7 +11,10 @@ import android.widget.TextView;
 import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.mobdev.currencyapp.Model.Coin;
+import com.mobdev.currencyapp.R;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
@@ -61,10 +65,7 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
         System.out.println(position + " " + coin + " " + coin.getRank());
         holder.coin = coin;
         holder.coinRank.setText(valueOf(coin.getRank()));
-//        holder.coinIcon.setImageIcon(createWithContentUri(valueOf(new File(coin.getLogoURL()).toURI()))); // fixme
-//        Glide.with(holder.mView)
-//                .load(coin.getLogoURL())
-//                .into(holder.coinIcon);
+        setCoinIcon(coin, holder.coinIcon);
         holder.coinFullName.setText(coin.getName());
         holder.coinShortName.setText(coin.getSymbol());
         holder.coinPrice.setText(formatChange(coin.getCurrentPriceUSD(), 4));
@@ -74,6 +75,16 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
         holder._1DChange.setTextColor(getColorBaseOnUpDown(coin.getPercentChange1D()));
         holder._1WChange.setText(formatChange(coin.getPercentChange1W(), 3));
         holder._1WChange.setTextColor(getColorBaseOnUpDown(coin.getPercentChange1W()));
+    }
+
+    private void setCoinIcon(Coin coin, ImageView coinIcon) {
+        Glide.with(context)
+                //.load(mImageUri) // Load image from assets
+                .load(coin.getLogoURL()) // Image URL
+                .centerCrop() // Image scale type
+                .override(100,100) // Resize image
+                .placeholder(drawable.coin_icon) // Place holder image
+                .into(coinIcon); // ImageView to display image
     }
 
     /**

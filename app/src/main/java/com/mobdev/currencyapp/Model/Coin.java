@@ -1,6 +1,12 @@
 package com.mobdev.currencyapp.Model;
 
 import android.annotation.SuppressLint;
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
+
+import com.github.mikephil.charting.data.CandleEntry;
+import com.mobdev.currencyapp.R;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -9,6 +15,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
 
+import static android.os.Build.VERSION_CODES.O;
+import static java.lang.Math.random;
+import static java.lang.Math.toIntExact;
 import static java.lang.String.format;
 import static java.util.Arrays.sort;
 
@@ -54,23 +63,41 @@ public class Coin {
         coinList = new LinkedList<>();
     }
 
-    public synchronized String getOHLCData(LocalDate day) {
-        // fixme do from server now just test
-        return generateRandomOHLCData(day);
-    }
-
     // todo only for testing
+    @RequiresApi(api = O)
     @SuppressLint("DefaultLocale")
-    private static String generateRandomOHLCData(LocalDate day) {
-        int[] numbers = new int[4];
-        for (int i = 0; i < 4; i++)
-            numbers[i] = new Random().nextInt(60_000);
-        sort(numbers);
-        int open = numbers[2],
-                high = numbers[0],
-                low = numbers[3],
-                close = numbers[1];
-        return format("%d,%d,%d,%d", open, high, low, close);
+    public synchronized ArrayList<CandleEntry> generateRandomOHLCData(LocalDate start, LocalDate end) {
+
+        ArrayList<CandleEntry> values = new ArrayList<>();
+
+//        values.add(new CandleEntry(values.size(), 4.62f, 2.02f, 2.70f, 4.13f));
+//        values.add(new CandleEntry(values.size(), 5.50f, 2.70f, 3.35f, 4.96f));
+//        values.add(new CandleEntry(values.size(), 5.25f, 3.02f, 3.50f, 4.50f));
+//        values.add(new CandleEntry(values.size(), 6f, 3.25f, 4.40f, 5.0f));
+//        values.add(new CandleEntry(values.size(), 5.57f, 2f, 2.80f, 4.5f));
+//        values.add(new CandleEntry(values.size(), 4.62f, 2.02f, 2.70f, 4.13f));
+
+        for (int i = toIntExact(end.toEpochDay() - 1); i >= toIntExact(start.toEpochDay()); i--) {
+            float multi = (100 + 1);
+            float val = (float) (random() * 40) + multi;
+
+            float high = (float) (random() * 9) + 8f;
+            float low = (float) (random() * 9) + 8f;
+
+            float open = (float) (random() * 6) + 1f;
+            float close = (float) (random() * 6) + 1f;
+
+            boolean even = i % 2 == 0;
+
+            values.add(new CandleEntry(
+                    toIntExact(start.toEpochDay()) - i,
+                    val + high,
+                    val - low,
+                    even ? val + open : val - open,
+                    even ? val - close : val + close
+            ));
+        }
+        return values;
     }
 
     public String getName() {

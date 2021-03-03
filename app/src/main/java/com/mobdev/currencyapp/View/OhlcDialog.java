@@ -1,8 +1,5 @@
 package com.mobdev.currencyapp.View;
 
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.RequiresApi;
@@ -24,11 +21,10 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayout.Tab;
 
 import java.time.LocalDate;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.stream.Stream;
 
 import static android.graphics.Color.WHITE;
 import static android.graphics.Paint.Style.FILL;
@@ -49,7 +45,7 @@ import static java.time.LocalDate.now;
  * create an instance of this fragment.
  */
 public class OhlcDialog extends DialogFragment implements TabLayout.OnTabSelectedListener {
-    private static HashMap<LocalDate, String> ohlcData;
+    private static ArrayList<CandleEntry> ohlcData;
     private static final String ohlcDataArg = "ohlcData",
             coinIDArg = "coinID";
     private static int coinID;
@@ -60,7 +56,7 @@ public class OhlcDialog extends DialogFragment implements TabLayout.OnTabSelecte
     /**
      * @return A new instance of fragment OhlcDialog.
      */
-    public static OhlcDialog newInstance(int coinID, HashMap<LocalDate, String> ohlcData) {
+    public static OhlcDialog newInstance(int coinID, ArrayList<CandleEntry> ohlcData) {
         OhlcDialog fragment = new OhlcDialog();
         Bundle args = new Bundle();
         args.putSerializable(ohlcDataArg, ohlcData);
@@ -73,7 +69,7 @@ public class OhlcDialog extends DialogFragment implements TabLayout.OnTabSelecte
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            ohlcData = (HashMap<LocalDate, String>) getArguments().getSerializable(ohlcDataArg);
+            ohlcData = (ArrayList<CandleEntry>) getArguments().getSerializable(ohlcDataArg);
             coinID = getArguments().getInt(coinIDArg);
         }
     }
@@ -98,21 +94,21 @@ public class OhlcDialog extends DialogFragment implements TabLayout.OnTabSelecte
 
         YAxis yAxis = chart.getAxisLeft();
         yAxis.setDrawAxisLine(true);
-        yAxis.setAxisMaximum(60_000);
-        yAxis.setAxisMinimum(0);
+//        yAxis.setAxisMaximum(60_000);
+//        yAxis.setAxisMinimum(0);
         yAxis.setEnabled(true);
 //        yAxis.setDrawGridLinesBehindData(true);
 
         yAxis = chart.getAxisRight();
         yAxis.setDrawAxisLine(true);
-        yAxis.setAxisMaximum(60_000);
-        yAxis.setAxisMinimum(0);
+//        yAxis.setAxisMaximum(60_000);
+//        yAxis.setAxisMinimum(0);
         yAxis.setEnabled(true);
 //        yAxis.setDrawGridLinesBehindData(true);
 
         chart.resetTracking();
 
-        CandleDataSet candleDataSet = getCandleDataSet(ohlcData);
+        CandleDataSet candleDataSet = new CandleDataSet(ohlcData, "DataSet");
 
         candleDataSet.setDrawIcons(false);
         candleDataSet.setAxisDependency(LEFT);
@@ -129,22 +125,6 @@ public class OhlcDialog extends DialogFragment implements TabLayout.OnTabSelecte
 
         chart.getLegend().setEnabled(false);
         return view;
-    }
-
-    @RequiresApi(api = O)
-    private static CandleDataSet getCandleDataSet(HashMap<LocalDate, String> ohlcData) {
-        return new CandleDataSet(new LinkedList<CandleEntry>() {{
-            for (Map.Entry<LocalDate, String> pieceOfData : ohlcData.entrySet()) {
-                int open = parseInt(pieceOfData.getValue().split(",")[0]),
-                        high = parseInt(pieceOfData.getValue().split(",")[1]),
-                        low = parseInt(pieceOfData.getValue().split(",")[2]),
-                        close = parseInt(pieceOfData.getValue().split(",")[3]);
-
-                add(new CandleEntry(
-                        now().toEpochDay() - pieceOfData.getKey().toEpochDay(), high, low, open, close
-                ));
-            }
-        }}, "Data set");
     }
 
     @Override

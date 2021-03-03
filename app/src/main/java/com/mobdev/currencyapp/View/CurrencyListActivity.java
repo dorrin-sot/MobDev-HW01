@@ -15,9 +15,11 @@ import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.github.mikephil.charting.data.CandleEntry;
 import com.mobdev.currencyapp.Model.Coin;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -102,26 +104,22 @@ public class CurrencyListActivity extends AppCompatActivity {
                 case openOhlcPage: {
                     Coin coin = (Coin) msg.obj;
                     int numberOfDays = msg.arg1;
-                    HashMap<LocalDate, String> ohlcData = new HashMap<>();
-                    for (int day = 1; day <= numberOfDays; day++) {
-                        int finalDay = day;
-                        executor.execute(() -> {
-                            LocalDate date = now().minusDays(finalDay);
+                    executor.execute(() -> {
+                        LocalDate date = now().minusDays(numberOfDays);
+                        ArrayList<CandleEntry> ohlcData = coin.generateRandomOHLCData(date, now());
 
-                            ohlcData.put(date, coin.getOHLCData(date));
+                        runOnUiThread(() -> {
+                            FragmentTransaction ft = getFragmentManager().beginTransaction();
+                            Fragment prev = getFragmentManager().findFragmentById(id.ohlcDialogFragment);
+                            if (prev != null)
+                                ft.remove(prev);
+                            ft.addToBackStack(null);
 
-                            runOnUiThread(() -> {
-                                FragmentTransaction ft = getFragmentManager().beginTransaction();
-                                Fragment prev = getFragmentManager().findFragmentById(id.ohlcDialogFragment);
-                                if (prev != null)
-                                    ft.remove(prev);
-                                ft.addToBackStack(null);
-
-                                DialogFragment newFragment = newInstance(coin.getId(), ohlcData);
-                                newFragment.show(getSupportFragmentManager(), "ohlc");
-                            });
+                            DialogFragment newFragment = newInstance(coin.getId(), ohlcData);
+                            newFragment.show(getSupportFragmentManager(), "ohlc");
                         });
-                    }
+                    });
+
                 }
                 break;
                 default:

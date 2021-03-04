@@ -45,8 +45,9 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
 
     public synchronized void refreshCoinList() {
         clearCoinList();
+        int size = coins.size();
         coins = new HashMap<>();
-        for (int i = 0; i < coins.size(); i++) {
+        for (int i = 0; i < size; i++) {
             notifyItemRemoved(0);
         }
     }

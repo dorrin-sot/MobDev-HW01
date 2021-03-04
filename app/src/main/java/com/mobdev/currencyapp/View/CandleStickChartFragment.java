@@ -1,29 +1,35 @@
 package com.mobdev.currencyapp.View;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import com.github.mikephil.charting.charts.CandleStickChart;
+import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.CandleData;
 import com.github.mikephil.charting.data.CandleDataSet;
 import com.github.mikephil.charting.data.CandleEntry;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.mobdev.currencyapp.R;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import static android.graphics.Color.WHITE;
 import static android.graphics.Paint.Style.FILL;
 import static androidx.core.content.ContextCompat.getColor;
 import static com.github.mikephil.charting.components.XAxis.XAxisPosition.BOTH_SIDED;
 import static com.github.mikephil.charting.components.YAxis.AxisDependency.LEFT;
+import static java.time.LocalDate.now;
+import static java.time.format.DateTimeFormatter.ofPattern;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -47,6 +53,10 @@ public class CandleStickChartFragment extends Fragment {
         return fragment;
     }
 
+    public static void setOhlcData(ArrayList<CandleEntry> ohlcData) {
+        CandleStickChartFragment.ohlcData = ohlcData;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +65,7 @@ public class CandleStickChartFragment extends Fragment {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -73,6 +84,12 @@ public class CandleStickChartFragment extends Fragment {
         xAxis.setPosition(BOTH_SIDED);
         xAxis.setDrawAxisLine(true);
         xAxis.setDrawGridLinesBehindData(true);
+
+        LinkedList<String> xAxisLabel = new LinkedList<>();
+        for (int i = 0; i < ohlcData.size(); i++)
+            xAxisLabel.addLast(ofPattern("M/d").format(now().minusDays(i).minusDays(1)));
+
+        xAxis.setValueFormatter(new IndexAxisValueFormatter(xAxisLabel));
 
         YAxis yAxis = chart.getAxisLeft();
         yAxis.setDrawAxisLine(true);

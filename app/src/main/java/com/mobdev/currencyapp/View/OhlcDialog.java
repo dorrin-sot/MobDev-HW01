@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.github.mikephil.charting.data.CandleEntry;
@@ -21,7 +22,7 @@ import java.util.ArrayList;
 
 import static android.os.Build.VERSION_CODES.O;
 import static androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_FADE;
-import static com.mobdev.currencyapp.R.id;
+import static com.mobdev.currencyapp.R.*;
 import static com.mobdev.currencyapp.R.layout;
 
 /**
@@ -71,13 +72,20 @@ public class OhlcDialog extends DialogFragment implements TabLayout.OnTabSelecte
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        tabLayout = view.findViewById(R.id.tabLayout);
+        tabLayout = view.findViewById(id.tabLayout);
         tabLayout.addOnTabSelectedListener(this);
         tabLayout.getTabAt(0).select();
     }
 
     @Override
     public void onTabSelected(Tab tab) {
+//        getChildFragmentManager().beginTransaction()
+//                .replace(id.chartFragment, CandleStickChartFragment.newInstance(
+//                        tab.getId() == id.show1WTab ? ohlcData1Week : ohlcData1Month)
+//                )
+//                .addToBackStack(null)
+//                .setTransition(TRANSIT_FRAGMENT_FADE)
+//                .commit();
         getChildFragmentManager().beginTransaction()
                 .replace(id.chartFragment, CandleStickChartFragment.newInstance(
                         tab.getId() == id.show1WTab ? ohlcData1Week : ohlcData1Month)

@@ -101,9 +101,11 @@ public class CurrencyListActivity extends AppCompatActivity {
                 case openOhlcPage: {
                     Coin coin = (Coin) msg.obj;
                     executor.execute(() -> {
-                        LocalDate date = now().minusDays(7);
+                        LocalDate date = now().minusDays(7)
+                                .minusDays(1); // to exclude today
                         ArrayList<CandleEntry> ohlcData1Week = coin.generateRandomOHLCData(date, now());
-                        date = now().minusMonths(1);
+                        date = now().minusMonths(1)
+                                .minusDays(1); // to exclude today
                         ArrayList<CandleEntry> ohlcData1Month = coin.generateRandomOHLCData(date, now());
 
                         runOnUiThread(() -> {

@@ -1,5 +1,8 @@
 package com.mobdev.currencyapp.View;
 
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
+import android.app.Dialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,30 +27,34 @@ import static com.mobdev.currencyapp.R.layout;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link OhlcDialog#newInstance} factory method to
+ * Use the {@link OhlcDialogFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class OhlcDialog extends DialogFragment implements TabLayout.OnTabSelectedListener {
+public class OhlcDialogFragment extends DialogFragment implements TabLayout.OnTabSelectedListener {
     private static ArrayList<CandleEntry> ohlcData1Week, ohlcData1Month;
     private static boolean startFrom1WeekOrMonth;
-    private static final String ohlcData1WeekArg = "ohlcData1Week", ohlcData1MonthArg = "ohlcData1Month", startFrom1WeekOrMonthArg = "startFrom1WeekOrMonth";
+    private static String coinName;
+    private static final String ohlcData1WeekArg = "ohlcData1Week", ohlcData1MonthArg = "ohlcData1Month",
+            startFrom1WeekOrMonthArg = "startFrom1WeekOrMonth", coinNameArg = "coinName";
 
     private TabLayout tabLayout;
 
-    public OhlcDialog() {
+    public OhlcDialogFragment() {
     }
 
     /**
-     * @return A new instance of fragment OhlcDialog.
+     * @return A new instance of fragment OhlcDialogFragment.
      */
-    public static OhlcDialog newInstance(ArrayList<CandleEntry> ohlcData1Week,
-                                         ArrayList<CandleEntry> ohlcData1Month,
-                                         boolean startFrom1WeekOrMonth) {
-        OhlcDialog fragment = new OhlcDialog();
+    public static OhlcDialogFragment newInstance(ArrayList<CandleEntry> ohlcData1Week,
+                                                 ArrayList<CandleEntry> ohlcData1Month,
+                                                 boolean startFrom1WeekOrMonth,
+                                                 String coinName) {
+        OhlcDialogFragment fragment = new OhlcDialogFragment();
         Bundle args = new Bundle();
         args.putSerializable(ohlcData1WeekArg, ohlcData1Week);
         args.putSerializable(ohlcData1MonthArg, ohlcData1Month);
         args.putBoolean(startFrom1WeekOrMonthArg, startFrom1WeekOrMonth);
+        args.putString(coinNameArg, coinName);
         fragment.setArguments(args);
         return fragment;
     }
@@ -59,6 +66,7 @@ public class OhlcDialog extends DialogFragment implements TabLayout.OnTabSelecte
             ohlcData1Week = (ArrayList<CandleEntry>) getArguments().getSerializable(ohlcData1WeekArg);
             ohlcData1Month = (ArrayList<CandleEntry>) getArguments().getSerializable(ohlcData1MonthArg);
             startFrom1WeekOrMonth = getArguments().getBoolean(startFrom1WeekOrMonthArg);
+            coinName = getArguments().getString(coinNameArg);
         }
     }
 

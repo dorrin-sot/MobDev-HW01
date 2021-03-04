@@ -84,7 +84,6 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
 
     private void setCoinIcon(Coin coin, ImageView coinIcon) {
         Glide.with(context)
-                //.load(mImageUri) // Load image from assets
                 .load(coin.getLogoURL()) // Image URL
                 .centerCrop() // Image scale type
                 .override(100, 100) // Resize image

@@ -115,7 +115,7 @@ public class CurrencyListActivity extends AppCompatActivity {
                                 ft.remove(prev);
                             ft.addToBackStack(null);
 
-                            DialogFragment newFragment = newInstance(ohlcData1Week, ohlcData1Month);
+                            DialogFragment newFragment = newInstance(ohlcData1Week, ohlcData1Month, true);
                             newFragment.show(getSupportFragmentManager(), "ohlc");
                         });
                     });

@@ -57,7 +57,7 @@ public class CurrencyListActivity extends AppCompatActivity {
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), VERTICAL));
         adapter = (MyCoinListRecyclerViewAdapter) recyclerView.getAdapter();
 
-        refreshAndStartOver();
+        findViewById(id.refreshBtn).performClick();
     }
 
     public void refreshAndStartOver() {

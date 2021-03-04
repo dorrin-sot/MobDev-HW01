@@ -10,14 +10,12 @@ import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import com.github.mikephil.charting.charts.CandleStickChart;
-import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.CandleData;
 import com.github.mikephil.charting.data.CandleDataSet;
 import com.github.mikephil.charting.data.CandleEntry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
-import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.mobdev.currencyapp.R;
 
 import java.util.ArrayList;
@@ -51,10 +49,6 @@ public class CandleStickChartFragment extends Fragment {
         args.putSerializable(ohlcDataArg, ohlcData);
         fragment.setArguments(args);
         return fragment;
-    }
-
-    public static void setOhlcData(ArrayList<CandleEntry> ohlcData) {
-        CandleStickChartFragment.ohlcData = ohlcData;
     }
 
     @Override

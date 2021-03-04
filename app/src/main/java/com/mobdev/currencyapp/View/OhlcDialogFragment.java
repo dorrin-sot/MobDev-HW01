@@ -1,15 +1,10 @@
 package com.mobdev.currencyapp.View;
 
-import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
-import android.app.Dialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
@@ -75,6 +70,13 @@ public class OhlcDialogFragment extends DialogFragment implements TabLayout.OnTa
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(layout.fragment_ohlc_dialog, container, false);
+
+        getChildFragmentManager().beginTransaction()
+                .replace(id.chartFragment, CandleStickChartFragment.newInstance(
+                        startFrom1WeekOrMonth
+                                ?
+                                ohlcData1Week : ohlcData1Month
+                )).commit();
 
         tabLayout = view.findViewById(id.tabLayout);
         tabLayout.addOnTabSelectedListener(this);

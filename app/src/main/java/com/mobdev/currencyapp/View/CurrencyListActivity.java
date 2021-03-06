@@ -40,7 +40,7 @@ public class CurrencyListActivity extends AppCompatActivity {
     static Handler handler = new Handler();
     public static final int loadCoins = 1, openOhlcPage = 2;
     public static DatabaseHandler dataBaseHandler ;
-    ThreadPoolExecutor executor;
+    static ThreadPoolExecutor executer;
 
     RecyclerView recyclerView;
     MyCoinListRecyclerViewAdapter adapter;
@@ -52,7 +52,7 @@ public class CurrencyListActivity extends AppCompatActivity {
         findViewById(id.loadNext10Btn).setOnClickListener(v -> loadNext10());
         findViewById(id.refreshBtn).setOnClickListener(v -> refreshAndStartOver());
         dataBaseHandler = new DatabaseHandler(this);
-        executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(5);
+        executer = (ThreadPoolExecutor) Executors.newFixedThreadPool(5);
         recyclerView = findViewById(id.coinRecyclerView);
         recyclerView.setAdapter(new MyCoinListRecyclerViewAdapter());
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), VERTICAL));
@@ -91,7 +91,7 @@ public class CurrencyListActivity extends AppCompatActivity {
                     });
                     for (int id = start; id < end; id++) {
                         int finalId = id;
-                        executor.execute(() -> {
+                        executer.execute(() -> {
                             Coin coin = getCoin(finalId);
                             runOnUiThread(() -> {
                                 adapter.addCoinObj(coin);
@@ -103,7 +103,7 @@ public class CurrencyListActivity extends AppCompatActivity {
                 break;
                 case openOhlcPage: {
                     Coin coin = (Coin) msg.obj;
-                    executor.execute(() -> {
+                    executer.execute(() -> {
                         LocalDate date = now().minusDays(7)
                                 .minusDays(1); // to exclude today
                         ArrayList<CandleEntry> ohlcData1Week = coin.generateRandomOHLCData(date, now());
@@ -150,4 +150,8 @@ public class CurrencyListActivity extends AppCompatActivity {
     public static Handler getHandler() {
         return handler;
     }
+    public static ThreadPoolExecutor getExecuter(){
+        return executer;
+    }
+
 }

@@ -105,10 +105,10 @@ public class CurrencyListActivity extends AppCompatActivity {
                     executor.execute(() -> {
                         LocalDate date = now().minusDays(7)
                                 .minusDays(1); // to exclude today
-                        ArrayList<CandleEntry> ohlcData1Week = coin.generateRandomOHLCData(date, now());
+                        ArrayList<CandleEntry> ohlcData1Week = coin.generateRandomOHLCData(date, now().minusDays(1));
                         date = now().minusMonths(1)
                                 .minusDays(1); // to exclude today
-                        ArrayList<CandleEntry> ohlcData1Month = coin.generateRandomOHLCData(date, now());
+                        ArrayList<CandleEntry> ohlcData1Month = coin.generateRandomOHLCData(date, now().minusDays(1));
 
                         runOnUiThread(() -> {
                             FragmentTransaction ft = getFragmentManager().beginTransaction();

@@ -1,7 +1,5 @@
 package com.mobdev.currencyapp.Model;
 
-import android.annotation.SuppressLint;
-
 import androidx.annotation.RequiresApi;
 
 import com.github.mikephil.charting.data.CandleEntry;
@@ -58,12 +56,11 @@ public class Coin {
 
     // todo only for testing
     @RequiresApi(api = O)
-    @SuppressLint("DefaultLocale")
     public synchronized ArrayList<CandleEntry> generateRandomOHLCData(LocalDate start, LocalDate end) {
 
         ArrayList<CandleEntry> values = new ArrayList<>();
 
-        for (int i = toIntExact(end.toEpochDay() - 1); i >= toIntExact(start.toEpochDay()); i--) {
+        for (int i = toIntExact(end.toEpochDay()); i >= toIntExact(start.toEpochDay()); i--) {
             float multi = (100 + 1);
             float val = (float) (random() * 40) + multi;
 

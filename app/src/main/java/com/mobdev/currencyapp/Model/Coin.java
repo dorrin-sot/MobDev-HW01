@@ -3,6 +3,8 @@ package com.mobdev.currencyapp.Model;
 import androidx.annotation.RequiresApi;
 
 import com.github.mikephil.charting.data.CandleEntry;
+import com.mobdev.currencyapp.Controller.DatabaseHandler;
+import com.mobdev.currencyapp.View.CurrencyListActivity;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -42,12 +44,14 @@ public class Coin {
         this.percentChange1W = percentChange1W;
     }
 
-    public static synchronized Coin getCoin(int id) {
+    public static synchronized Coin getCoin(int rank) {
         // fixme do from server now just test
-        coinList.addLast(new Coin("Bitcoin", "BTC", id, coinList.size() + 1, "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
-                50000000, 0.025, -0.255, 0.664
-        ));
-        return coinList.getLast();
+       // coinList.addLast();
+      //  return coinList.getLast();
+   //     CurrencyListActivity.dataBaseHandler.addCoin(new Coin("Bitcoin", "BTC", coinList.size()+1, rank, "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
+     ///           500000, rank, -0.255, 0.664
+       // ));
+        return CurrencyListActivity.dataBaseHandler.getCoin(rank);
     }
 
     public static synchronized void clearCoinList() {

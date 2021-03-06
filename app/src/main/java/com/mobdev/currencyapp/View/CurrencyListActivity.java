@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.mikephil.charting.data.CandleEntry;
+import com.mobdev.currencyapp.Controller.DatabaseHandler;
 import com.mobdev.currencyapp.Model.Coin;
 
 import java.time.LocalDate;
@@ -38,7 +39,7 @@ import static java.time.LocalDate.now;
 public class CurrencyListActivity extends AppCompatActivity {
     static Handler handler = new Handler();
     public static final int loadCoins = 1, openOhlcPage = 2;
-
+    public static DatabaseHandler dataBaseHandler ;
     ThreadPoolExecutor executor;
 
     RecyclerView recyclerView;
@@ -50,7 +51,7 @@ public class CurrencyListActivity extends AppCompatActivity {
         setContentView(layout.activity_currency_list);
         findViewById(id.loadNext10Btn).setOnClickListener(v -> loadNext10());
         findViewById(id.refreshBtn).setOnClickListener(v -> refreshAndStartOver());
-
+        dataBaseHandler = new DatabaseHandler(this);
         executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(5);
         recyclerView = findViewById(id.coinRecyclerView);
         recyclerView.setAdapter(new MyCoinListRecyclerViewAdapter());

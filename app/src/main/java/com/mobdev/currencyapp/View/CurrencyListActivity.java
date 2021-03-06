@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static android.os.Build.VERSION_CODES.N;
 import static android.os.Build.VERSION_CODES.O;
@@ -32,7 +33,7 @@ import static com.mobdev.currencyapp.Model.Coin.getCoin;
 import static com.mobdev.currencyapp.R.id;
 import static com.mobdev.currencyapp.R.layout;
 import static com.mobdev.currencyapp.View.MyCoinListRecyclerViewAdapter.getCoins;
-import static com.mobdev.currencyapp.View.OhlcDialog.newInstance;
+import static com.mobdev.currencyapp.View.OhlcDialogFragment.newInstance;
 import static java.time.LocalDate.now;
 
 public class CurrencyListActivity extends AppCompatActivity {
@@ -57,7 +58,7 @@ public class CurrencyListActivity extends AppCompatActivity {
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), VERTICAL));
         adapter = (MyCoinListRecyclerViewAdapter) recyclerView.getAdapter();
 
-        refreshAndStartOver();
+        findViewById(id.refreshBtn).performClick();
     }
 
     public void refreshAndStartOver() {
@@ -77,6 +78,7 @@ public class CurrencyListActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        AtomicInteger numberOfDialogsOpened = new AtomicInteger();
         handler = new Handler(Looper.getMainLooper(), msg -> {
             switch (msg.what) {
                 case loadCoins: {
@@ -102,9 +104,11 @@ public class CurrencyListActivity extends AppCompatActivity {
                 case openOhlcPage: {
                     Coin coin = (Coin) msg.obj;
                     executor.execute(() -> {
-                        LocalDate date = now().minusDays(7);
+                        LocalDate date = now().minusDays(7)
+                                .minusDays(1); // to exclude today
                         ArrayList<CandleEntry> ohlcData1Week = coin.generateRandomOHLCData(date, now());
-                        date = now().minusMonths(1);
+                        date = now().minusMonths(1)
+                                .minusDays(1); // to exclude today
                         ArrayList<CandleEntry> ohlcData1Month = coin.generateRandomOHLCData(date, now());
 
                         runOnUiThread(() -> {
@@ -114,8 +118,10 @@ public class CurrencyListActivity extends AppCompatActivity {
                                 ft.remove(prev);
                             ft.addToBackStack(null);
 
-                            DialogFragment newFragment = newInstance(ohlcData1Week, ohlcData1Month);
-                            newFragment.show(getSupportFragmentManager(), "ohlc");
+                            DialogFragment ohlcDialog = newInstance(ohlcData1Week, ohlcData1Month, true, coin.getName());
+                            String tag = "ohlc" + numberOfDialogsOpened.incrementAndGet();
+                            System.out.println("tag = " + tag);
+                            ohlcDialog.show(getSupportFragmentManager(), tag);
                         });
                     });
                 }

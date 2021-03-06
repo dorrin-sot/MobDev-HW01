@@ -5,17 +5,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.github.mikephil.charting.data.CandleEntry;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayout.Tab;
-import com.mobdev.currencyapp.R;
 
 import java.util.ArrayList;
 
@@ -26,27 +22,34 @@ import static com.mobdev.currencyapp.R.layout;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link OhlcDialog#newInstance} factory method to
+ * Use the {@link OhlcDialogFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class OhlcDialog extends DialogFragment implements TabLayout.OnTabSelectedListener {
+public class OhlcDialogFragment extends DialogFragment implements TabLayout.OnTabSelectedListener {
     private static ArrayList<CandleEntry> ohlcData1Week, ohlcData1Month;
-    private static final String ohlcData1WeekArg = "ohlcData1Week", ohlcData1MonthArg = "ohlcData1Month";
+    private static boolean startFrom1WeekOrMonth;
+    private static String coinName;
+    private static final String ohlcData1WeekArg = "ohlcData1Week", ohlcData1MonthArg = "ohlcData1Month",
+            startFrom1WeekOrMonthArg = "startFrom1WeekOrMonth", coinNameArg = "coinName";
 
     private TabLayout tabLayout;
 
-    public OhlcDialog() {
+    public OhlcDialogFragment() {
     }
 
     /**
-     * @return A new instance of fragment OhlcDialog.
+     * @return A new instance of fragment OhlcDialogFragment.
      */
-    public static OhlcDialog newInstance(ArrayList<CandleEntry> ohlcData1Week,
-                                         ArrayList<CandleEntry> ohlcData1Month) {
-        OhlcDialog fragment = new OhlcDialog();
+    public static OhlcDialogFragment newInstance(ArrayList<CandleEntry> ohlcData1Week,
+                                                 ArrayList<CandleEntry> ohlcData1Month,
+                                                 boolean startFrom1WeekOrMonth,
+                                                 String coinName) {
+        OhlcDialogFragment fragment = new OhlcDialogFragment();
         Bundle args = new Bundle();
         args.putSerializable(ohlcData1WeekArg, ohlcData1Week);
         args.putSerializable(ohlcData1MonthArg, ohlcData1Month);
+        args.putBoolean(startFrom1WeekOrMonthArg, startFrom1WeekOrMonth);
+        args.putString(coinNameArg, coinName);
         fragment.setArguments(args);
         return fragment;
     }
@@ -57,6 +60,8 @@ public class OhlcDialog extends DialogFragment implements TabLayout.OnTabSelecte
         if (getArguments() != null) {
             ohlcData1Week = (ArrayList<CandleEntry>) getArguments().getSerializable(ohlcData1WeekArg);
             ohlcData1Month = (ArrayList<CandleEntry>) getArguments().getSerializable(ohlcData1MonthArg);
+            startFrom1WeekOrMonth = getArguments().getBoolean(startFrom1WeekOrMonthArg);
+            coinName = getArguments().getString(coinNameArg);
         }
     }
 
@@ -64,24 +69,32 @@ public class OhlcDialog extends DialogFragment implements TabLayout.OnTabSelecte
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View view = inflater.inflate(layout.fragment_ohlc_dialog, container, false);
 
-        return inflater.inflate(layout.fragment_ohlc_dialog, container, false);
-    }
+        getChildFragmentManager().beginTransaction()
+                .replace(id.chartFragment, CandleStickChartFragment.newInstance(
+                        startFrom1WeekOrMonth
+                                ?
+                                ohlcData1Week : ohlcData1Month
+                )).commit();
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        tabLayout = view.findViewById(R.id.tabLayout);
+        tabLayout = view.findViewById(id.tabLayout);
         tabLayout.addOnTabSelectedListener(this);
-        tabLayout.getTabAt(0).select();
+        onTabSelected(tabLayout.getTabAt(startFrom1WeekOrMonth ? 0 : 1));
+
+        return view;
     }
 
     @Override
     public void onTabSelected(Tab tab) {
+        boolean show1WeekOrMonth = tab.getText().toString().toLowerCase().contains("week");
+
         getChildFragmentManager().beginTransaction()
                 .replace(id.chartFragment, CandleStickChartFragment.newInstance(
-                        tab.getId() == id.show1WTab ? ohlcData1Week : ohlcData1Month)
-                )
+                        show1WeekOrMonth
+                                ?
+                                ohlcData1Week : ohlcData1Month
+                ))
                 .addToBackStack(null)
                 .setTransition(TRANSIT_FRAGMENT_FADE)
                 .commit();

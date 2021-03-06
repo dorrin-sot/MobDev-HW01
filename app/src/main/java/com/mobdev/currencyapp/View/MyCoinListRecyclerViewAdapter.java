@@ -45,8 +45,9 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
 
     public synchronized void refreshCoinList() {
         clearCoinList();
+        int size = coins.size();
         coins = new HashMap<>();
-        for (int i = 0; i < coins.size(); i++) {
+        for (int i = 0; i < size; i++) {
             notifyItemRemoved(0);
         }
     }
@@ -83,7 +84,6 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
 
     private void setCoinIcon(Coin coin, ImageView coinIcon) {
         Glide.with(context)
-                //.load(mImageUri) // Load image from assets
                 .load(coin.getLogoURL()) // Image URL
                 .centerCrop() // Image scale type
                 .override(100, 100) // Resize image

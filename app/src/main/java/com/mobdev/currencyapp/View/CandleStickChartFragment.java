@@ -1,12 +1,14 @@
 package com.mobdev.currencyapp.View;
 
+import android.app.Activity;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import com.github.mikephil.charting.charts.CandleStickChart;
@@ -15,8 +17,10 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.CandleData;
 import com.github.mikephil.charting.data.CandleDataSet;
 import com.github.mikephil.charting.data.CandleEntry;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.mobdev.currencyapp.R;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 import static android.graphics.Color.WHITE;
@@ -24,6 +28,9 @@ import static android.graphics.Paint.Style.FILL;
 import static androidx.core.content.ContextCompat.getColor;
 import static com.github.mikephil.charting.components.XAxis.XAxisPosition.BOTH_SIDED;
 import static com.github.mikephil.charting.components.YAxis.AxisDependency.LEFT;
+import static java.lang.String.valueOf;
+import static java.time.LocalDate.now;
+import static java.time.format.DateTimeFormatter.ofPattern;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -55,6 +62,7 @@ public class CandleStickChartFragment extends Fragment {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -63,26 +71,47 @@ public class CandleStickChartFragment extends Fragment {
 
         CandleStickChart chart = view.findViewById(R.id.ohlcChart);
 
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int width = (int) (0.8 * displayMetrics.widthPixels);
+        chart.setMinimumWidth(width);
+        chart.setMinimumHeight(width);
+
         chart.setMaxVisibleValueCount(32);
         chart.getDescription().setEnabled(false);
         chart.setBackgroundColor(WHITE);
-        chart.setPinchZoom(false);
+        chart.setPinchZoom(true);
+        chart.setDoubleTapToZoomEnabled(true);
         chart.setDrawGridBackground(false);
 
         XAxis xAxis = chart.getXAxis();
         xAxis.setPosition(BOTH_SIDED);
         xAxis.setDrawAxisLine(true);
         xAxis.setDrawGridLinesBehindData(true);
+        xAxis.setAvoidFirstLastClipping(true);
+        System.out.println(width);
+        xAxis.setTextSize(width / 125f);
+        xAxis.setDrawLabels(true);
+        xAxis.setValueFormatter(new IndexAxisValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                LocalDate date = now().minusDays((long) value).minusDays(1);
+                return valueOf(ofPattern("MM/dd").format(date));
+            }
+        });
+        xAxis.setLabelRotationAngle(-30);
 
         YAxis yAxis = chart.getAxisLeft();
         yAxis.setDrawAxisLine(true);
         yAxis.setEnabled(true);
         yAxis.setDrawGridLinesBehindData(true);
+        yAxis.setTextSize(width / 125f);
 
         yAxis = chart.getAxisRight();
         yAxis.setDrawAxisLine(true);
         yAxis.setEnabled(true);
         yAxis.setDrawGridLinesBehindData(true);
+        yAxis.setTextSize(width / 125f);
 
         chart.resetTracking();
 
@@ -97,6 +126,8 @@ public class CandleStickChartFragment extends Fragment {
         candleDataSet.setIncreasingColor(getColor(getContext(), R.color.up_green));
         candleDataSet.setIncreasingPaintStyle(FILL);
         candleDataSet.setNeutralColor(getColor(getContext(), R.color.neutral_blue));
+        candleDataSet.setBarSpace(0.3f);
+        candleDataSet.setValueTextSize(width / 200f);
 
         chart.setData(new CandleData(candleDataSet));
         chart.invalidate();

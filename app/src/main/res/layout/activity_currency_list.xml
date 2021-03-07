@@ -51,11 +51,21 @@
         android:layout_marginTop="5dp"
         android:layout_marginEnd="5dp"
         android:layout_marginBottom="10dp"
+        android:isScrollContainer="true"
+        app:layoutManager="LinearLayoutManager"
         app:layout_constraintBottom_toTopOf="@+id/loadingProgressBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layoutManager="LinearLayoutManager"
-        android:isScrollContainer="true"
-        tools:listitem="@layout/coin"/>
+        tools:listitem="@layout/coin" />
+
+    <ImageView
+        android:id="@+id/noConnectionImg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/coinRecyclerView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/no_connection" />
 </androidx.constraintlayout.widget.ConstraintLayout>

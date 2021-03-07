@@ -72,8 +72,8 @@ public class Coin {
 //        Coin coin = constructCoin(id); // fixme uncomment if yasin says
         Coin coin = getCoinn(rank); // fixme comment if yasin says
         coinList.addLast(coin);
-//        CurrencyListActivity.dataBaseHandler.addCoin(coin); //fixme uncomment
-        return coinList.getLast();
+        CurrencyListActivity.dataBaseHandler.addCoin(coin); //fixme uncomment
+        return coin;
     }
 
     // fixme comment if yasin says
@@ -93,19 +93,6 @@ public class Coin {
                     .getJSONArray("data").getJSONObject(0);
 
             int id = coinData.getInt("id");
-
-//            OkHttpClient logoClient = new OkHttpClient();
-//            HttpUrl.Builder logoUrlBuilder = HttpUrl.parse("https://pro-api.coinmarketcap.com/v2/cryptocurrency/info").newBuilder();
-//            logoUrlBuilder.addQueryParameter("id", valueOf(id));
-//            Request logoRequest = new Request.Builder()
-//                    .addHeader("X-CMC_PRO_API_KEY", "642f8a9d-98d2-4ea4-877b-6775c3f16d22")
-//                    .addHeader("Accept", "application/json")
-//                    .url(logoUrlBuilder.build().toString())
-//                    .build();
-//
-//            Response logoResponse = coinClient.newCall(logoRequest).execute();
-//            JSONObject logoData = new JSONObject(logoResponse.body().string()).getJSONObject("data").getJSONObject(valueOf(id));
-//            System.out.println("logoData " + rank + "  = " + logoData);
 
             System.out.println("coinData " + rank + " = " + coinData);
             return new Coin(

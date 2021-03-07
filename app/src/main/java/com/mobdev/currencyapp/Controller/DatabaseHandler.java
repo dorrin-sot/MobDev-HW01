@@ -6,11 +6,18 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import androidx.annotation.RequiresApi;
+
 import com.mobdev.currencyapp.Model.Coin;
 
-public class DatabaseHandler extends SQLiteOpenHelper {
+import java.util.LinkedList;
 
-    private static final int DATABASE_VERSION = 3;
+import static android.os.Build.VERSION_CODES.N;
+import static java.lang.Double.parseDouble;
+import static java.lang.Integer.parseInt;
+
+public class DatabaseHandler extends SQLiteOpenHelper {
+    private static final int DATABASE_VERSION = 5;
     private static final String DATABASE_NAME = "coinsManager";
     private static final String TABLE_COINS = "coins";
     private static final String KEY_ID = "id";
@@ -18,6 +25,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_SYM = "symbol";
     private static final String KEY_RANK = "rank";
     private static final String KEY_PRICE = "price";
+    private static final String KEY_LOGO = "logo";
     private static final String KEY_P_C_H = "percent_hour";
     private static final String KEY_P_C_D = "percent_day";
     private static final String KEY_P_C_W = "percent_week";
@@ -26,12 +34,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         //3rd argument to be passed is CursorFactory instance
     }
+
     // Creating Tables
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String CREATE_COINS_TABLE = "CREATE TABLE " + TABLE_COINS + "("+ KEY_ID + " INTEGER PRIMARY KEY,"
+        // id name symbol rank logo_url price percent_hour percent_day percent_week
+        String CREATE_COINS_TABLE = "CREATE TABLE " + TABLE_COINS + "(" + KEY_ID + " INTEGER PRIMARY KEY,"
                 + KEY_NAME + " TEXT," + KEY_SYM + " TEXT,"
-                + KEY_RANK + " INTEGER," + KEY_PRICE + " REAL," + KEY_P_C_H + " REAL," + KEY_P_C_D + " REAL,"+KEY_P_C_W+" REAL" + ")";
+                + KEY_RANK + " INTEGER,"
+                + KEY_LOGO + " TEXT,"
+                + KEY_PRICE + " REAL," + KEY_P_C_H + " REAL," + KEY_P_C_D + " REAL," + KEY_P_C_W + " REAL" + ")";
         db.execSQL(CREATE_COINS_TABLE);
     }
 
@@ -40,6 +52,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Drop older table if existed
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_COINS);
+        System.out.println("DatabaseHandler.onUpgrade");
 
         // Create tables again
         onCreate(db);
@@ -48,9 +61,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     // code to add the new contact
     public void addCoin(Coin coin) {
         SQLiteDatabase db = this.getWritableDatabase();
+//        onUpgrade(db, 5,6);
 
         ContentValues values = new ContentValues();
+        values.put(KEY_ID, coin.getId());
         values.put(KEY_NAME, coin.getName());
+        values.put(KEY_LOGO, coin.getLogoURL());
         values.put(KEY_SYM, coin.getSymbol());
         values.put(KEY_RANK, coin.getRank());
         values.put(KEY_PRICE, coin.getCurrentPriceUSD());
@@ -68,15 +84,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public Coin getCoin(int rank) {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.query(TABLE_COINS, new String[] {
-                        KEY_NAME,KEY_SYM, KEY_RANK, KEY_PRICE, KEY_P_C_H, KEY_P_C_D,KEY_P_C_W }, KEY_RANK + "=?",
-                new String[] { String.valueOf(rank) }, null, null, null, null);
+        Cursor cursor = db.query(TABLE_COINS, new String[]
+                        {KEY_ID, KEY_NAME, KEY_SYM, KEY_RANK, KEY_LOGO, KEY_PRICE, KEY_P_C_H, KEY_P_C_D, KEY_P_C_W},
+                KEY_RANK + "=?",
+                new String[]{String.valueOf(rank)}, null, null, null, null);
         if (cursor != null)
             cursor.moveToFirst();
 
-        Coin coin = new Coin(cursor.getString(0),cursor.getString(1),Integer.parseInt(cursor.getString(2)),Integer.parseInt(cursor.getString(2)),"https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",Double.parseDouble(cursor.getString(3)),Double.parseDouble(cursor.getString(4)),Double.parseDouble(cursor.getString(5)),Double.parseDouble(cursor.getString(6)));
         // return contact
-        return coin;
+        return new Coin(
+                cursor.getString(1),
+                cursor.getString(2),
+                parseInt(cursor.getString(0)),
+                parseInt(cursor.getString(3)),
+                cursor.getString(4),
+                parseDouble(cursor.getString(5)),
+                parseDouble(cursor.getString(6)),
+                parseDouble(cursor.getString(7)),
+                parseDouble(cursor.getString(8))
+        );
     }
 
     // code to get all contacts in a list view
@@ -105,11 +131,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }*/
 
     // code to update the single contact
-    public int updateContact(Coin coin) {
+    public int updateCoin(Coin coin) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
+        values.put(KEY_ID, coin.getId());
         values.put(KEY_NAME, coin.getName());
+        values.put(KEY_LOGO, coin.getLogoURL());
         values.put(KEY_SYM, coin.getSymbol());
         values.put(KEY_RANK, coin.getRank());
         values.put(KEY_PRICE, coin.getCurrentPriceUSD());
@@ -119,14 +147,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         // updating row
         return db.update(TABLE_COINS, values, KEY_NAME + " = ?",
-                new String[] { String.valueOf(coin.getName()) });
+                new String[]{String.valueOf(coin.getName())});
     }
 
     // Deleting single contact
     public void deleteCoin(Coin coin) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_COINS, KEY_NAME + " = ?",
-                new String[] { String.valueOf(coin.getName()) });
+                new String[]{String.valueOf(coin.getName())});
         db.close();
     }
 
@@ -139,5 +167,35 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         // return count
         return cursor.getCount();
+    }
+
+    public LinkedList<Coin> getCoins() {
+        LinkedList<Coin> coins = new LinkedList<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(TABLE_COINS, new String[]
+                        {KEY_ID, KEY_NAME, KEY_SYM, KEY_RANK, KEY_LOGO, KEY_PRICE, KEY_P_C_H, KEY_P_C_D, KEY_P_C_W},
+                null, null, null, null, null, null);
+        if (cursor.moveToFirst())
+            do coins.add(new Coin(
+                    cursor.getString(1),
+                    cursor.getString(2),
+                    parseInt(cursor.getString(0)),
+                    parseInt(cursor.getString(3)),
+                    cursor.getString(4),
+                    parseDouble(cursor.getString(5)),
+                    parseDouble(cursor.getString(6)),
+                    parseDouble(cursor.getString(7)),
+                    parseDouble(cursor.getString(8))
+            )); while (cursor.moveToNext());
+
+        return coins;
+    }
+
+    @RequiresApi(api = N)
+    public boolean coinExists(Coin coin) {
+        return getCoins().stream()
+                .anyMatch(coin1 -> coin.getId() == coin1.getId());
     }
 }

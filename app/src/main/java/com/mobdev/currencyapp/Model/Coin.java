@@ -3,13 +3,13 @@ package com.mobdev.currencyapp.Model;
 import androidx.annotation.RequiresApi;
 
 import com.github.mikephil.charting.data.CandleEntry;
-import com.mobdev.currencyapp.Controller.DatabaseHandler;
 import com.mobdev.currencyapp.View.CurrencyListActivity;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -23,6 +23,7 @@ import okhttp3.Response;
 import static android.os.Build.VERSION_CODES.O;
 import static java.lang.Math.random;
 import static java.lang.Math.toIntExact;
+import static java.lang.String.valueOf;
 
 public class Coin {
     static LinkedList<Coin> coinList = new LinkedList<>();
@@ -61,16 +62,67 @@ public class Coin {
         this.percentChange1W = percentChange1W;
     }
 
-    public static synchronized Coin getCoin(int id) {
+    public static Coin getCoin(int rank) {
         // fixme do from server now just test
         // coinList.addLast();
         //  return coinList.getLast();
         //     CurrencyListActivity.dataBaseHandler.addCoin(new Coin("Bitcoin", "BTC", coinList.size()+1, rank, "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
         //           500000, rank, -0.255, 0.664
-         //));
-        Coin coin = constructCoin(id);
-        CurrencyListActivity.dataBaseHandler.addCoin(coin);
-        return CurrencyListActivity.dataBaseHandler.getCoin(id);
+        //));
+//        Coin coin = constructCoin(id); // fixme uncomment if yasin says
+        Coin coin = getCoinn(rank); // fixme comment if yasin says
+        coinList.addLast(coin);
+//        CurrencyListActivity.dataBaseHandler.addCoin(coin); //fixme uncomment
+        return coinList.getLast();
+    }
+
+    // fixme comment if yasin says
+    private static Coin getCoinn(int rank) {
+        OkHttpClient coinClient = new OkHttpClient();
+        HttpUrl.Builder urlBuilder = HttpUrl.parse("https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest").newBuilder();
+        urlBuilder.addQueryParameter("start", valueOf(rank));
+        urlBuilder.addQueryParameter("limit", valueOf(1));
+        Request request = new Request.Builder()
+                .addHeader("X-CMC_PRO_API_KEY", "535516e0-3c6b-464b-ab71-d383cd6b85b6")
+                .addHeader("Accept", "application/json")
+                .url(urlBuilder.build().toString())
+                .build();
+        try {
+            Response coinResponse = coinClient.newCall(request).execute();
+            JSONObject coinData = new JSONObject(coinResponse.body().string())
+                    .getJSONArray("data").getJSONObject(0);
+
+            int id = coinData.getInt("id");
+
+//            OkHttpClient logoClient = new OkHttpClient();
+//            HttpUrl.Builder logoUrlBuilder = HttpUrl.parse("https://pro-api.coinmarketcap.com/v2/cryptocurrency/info").newBuilder();
+//            logoUrlBuilder.addQueryParameter("id", valueOf(id));
+//            Request logoRequest = new Request.Builder()
+//                    .addHeader("X-CMC_PRO_API_KEY", "642f8a9d-98d2-4ea4-877b-6775c3f16d22")
+//                    .addHeader("Accept", "application/json")
+//                    .url(logoUrlBuilder.build().toString())
+//                    .build();
+//
+//            Response logoResponse = coinClient.newCall(logoRequest).execute();
+//            JSONObject logoData = new JSONObject(logoResponse.body().string()).getJSONObject("data").getJSONObject(valueOf(id));
+//            System.out.println("logoData " + rank + "  = " + logoData);
+
+            System.out.println("coinData " + rank + " = " + coinData);
+            return new Coin(
+                    coinData.getString("name"),
+                    coinData.getString("symbol"),
+                    id,
+                    rank,
+                    "https://s2.coinmarketcap.com/static/img/coins/64x64/" + id + ".png",
+                    coinData.getJSONObject("quote").getJSONObject("USD").getDouble("price"),
+                    coinData.getJSONObject("quote").getJSONObject("USD").getDouble("percent_change_1h"),
+                    coinData.getJSONObject("quote").getJSONObject("USD").getDouble("percent_change_24h"),
+                    coinData.getJSONObject("quote").getJSONObject("USD").getDouble("percent_change_7d")
+            );
+        } catch (IOException | JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @NotNull

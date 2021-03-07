@@ -52,7 +52,9 @@ public class CurrencyListActivity extends AppCompatActivity {
         findViewById(id.loadNext10Btn).setOnClickListener(v -> loadNext10());
         findViewById(id.refreshBtn).setOnClickListener(v -> refreshAndStartOver());
         dataBaseHandler = new DatabaseHandler(this);
+
         executer = (ThreadPoolExecutor) Executors.newFixedThreadPool(5);
+
         recyclerView = findViewById(id.coinRecyclerView);
         recyclerView.setAdapter(new MyCoinListRecyclerViewAdapter());
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), VERTICAL));
@@ -69,7 +71,7 @@ public class CurrencyListActivity extends AppCompatActivity {
     public void loadNext10() {
         Message message = new Message();
         message.what = loadCoins;
-        message.arg1 = getCoins().size(); // start
+        message.arg1 = getCoins().size()+1; // start
         message.arg2 = 10; // number of coins to load
         handler.sendMessage(message);
     }
@@ -89,10 +91,10 @@ public class CurrencyListActivity extends AppCompatActivity {
                         progressBar.setMax(num);
                         progressBar.setVisibility(VISIBLE);
                     });
-                    for (int id = start; id < end; id++) {
-                        int finalId = id;
+                    for (int rank = start; rank < end; rank++) {
+                        int finalRank = rank;
                         executer.execute(() -> {
-                            Coin coin = getCoin(finalId);
+                            Coin coin = getCoin(finalRank);
                             runOnUiThread(() -> {
                                 adapter.addCoinObj(coin);
                                 addProgress();

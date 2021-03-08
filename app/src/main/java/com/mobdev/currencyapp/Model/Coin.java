@@ -3,7 +3,6 @@ package com.mobdev.currencyapp.Model;
 import androidx.annotation.RequiresApi;
 
 import com.github.mikephil.charting.data.CandleEntry;
-import com.mobdev.currencyapp.View.CurrencyListActivity;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
@@ -13,7 +12,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.concurrent.CountDownLatch;
 
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -115,7 +113,6 @@ public class Coin {
 
     @NotNull
     private static Coin constructCoin(int id) {
-
         final String[] name = new String[1];
         final String[] symbol = new String[1];
         final String[] logoURL = {"https://s2.coinmarketcap.com/static/img/coins/64x64/" + id + ".png"};
@@ -127,6 +124,7 @@ public class Coin {
 
 
         JSONObject data = GetJSON(marketCapAPI, id, apiTtlte, apiKey);
+        System.out.println(data);
         try {
             name[0] = data.getString("name");
             symbol[0] = data.getString("symbol");
@@ -140,13 +138,13 @@ public class Coin {
             e.printStackTrace();
         }
         System.out.println(
-                "id:" + id+
-                "\nname:" + name[0] +
-                "\nsymbol:" + symbol[0]
-                + "\nrank:" + rank[0] + "\ncurrentprice:" + currentPriceUSD[0]
-                + "\npercentcahnge1w:" + percentChange1W[0]
-                + "\nlogourl: " + logoURL[0]);
-        return new Coin(name[0],symbol[0],id,rank[0],logoURL[0],currentPriceUSD[0],percentChange1H[0],percentChange1D[0],percentChange1W[0]);
+                "id:" + id +
+                        "\nname:" + name[0] +
+                        "\nsymbol:" + symbol[0]
+                        + "\nrank:" + rank[0] + "\ncurrentprice:" + currentPriceUSD[0]
+                        + "\npercentcahnge1w:" + percentChange1W[0]
+                        + "\nlogourl: " + logoURL[0]);
+        return new Coin(name[0], symbol[0], id, rank[0], logoURL[0], currentPriceUSD[0], percentChange1H[0], percentChange1D[0], percentChange1W[0]);
     }
 
     public static synchronized void clearCoinList() {
@@ -194,8 +192,11 @@ public class Coin {
         try {
             Response response = client.newCall(request).execute();
             JSONObject data = new JSONObject(response.body().string()).getJSONObject("data").getJSONObject("" + id + "");
+//            int errorCode = new JSONObject(response.body().string()).getJSONObject("status").getInt("error_code");
+//            if (errorCode != 0)
+//                System.out.println("errorCode = " + errorCode);
             return data;
-        } catch (Exception e ) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;

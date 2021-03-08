@@ -69,7 +69,7 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
         if (coin == null) return;
         System.out.println(position + " " + coin + " " + coin.getRank());
         holder.coin = coin;
-        holder.coinRank.setText(valueOf(coin.getRank()));
+//        holder.coinRank.setText(valueOf(coin.getRank()));
         setCoinIcon(coin, holder.coinIcon);
         holder.coinFullName.setText(coin.getName());
         holder.coinShortName.setText(coin.getSymbol());
@@ -116,7 +116,7 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public final View mView;
-        public final TextView coinRank,
+        public final TextView
                 coinFullName, coinShortName,
                 coinPrice,
                 _1HChange, _1DChange, _1WChange;
@@ -126,7 +126,6 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            coinRank = view.findViewById(id.coinRank);
             coinFullName = view.findViewById(id.coinFullName);
             coinShortName = view.findViewById(id.coinShortName);
             coinIcon = view.findViewById(id.coinIcon);

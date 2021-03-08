@@ -97,8 +97,9 @@ public class CurrencyListActivity extends AppCompatActivity {
 
     @RequiresApi(api = O)
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
+
         AtomicBoolean loadFromCache = new AtomicBoolean(false),
                 buttonClicked = new AtomicBoolean(false);
         AtomicInteger numberOfDialogsOpened = new AtomicInteger();
@@ -138,7 +139,7 @@ public class CurrencyListActivity extends AppCompatActivity {
 //                                    if (dataBaseHandler.coinExists(coin))
 //                                        dataBaseHandler.updateCoin(coin);
 //                                    else
-                                        dataBaseHandler.addCoin(coin);
+                                    dataBaseHandler.addCoin(coin);
 
                                     runOnUiThread(() -> {
                                         adapter.addCoinObj(coin);
@@ -193,14 +194,14 @@ public class CurrencyListActivity extends AppCompatActivity {
     @RequiresApi(api = N)
     synchronized void addProgress() {
         ProgressBar progressBar = findViewById(id.loadingProgressBar);
-        System.out.println(progressBar.getProgress() + ", " + progressBar.getMax());
+//        System.out.println(progressBar.getProgress() + ", " + progressBar.getMax());
 
         progressBar.setProgress(progressBar.getProgress() + 1, true);
 
         if (progressBar.getProgress() == progressBar.getMax() - 1) {
             progressBar.setVisibility(INVISIBLE);
             progressBar.setProgress(0, false);
-            System.out.println(progressBar.getProgress() + ", " + progressBar.getMax());
+//            System.out.println(progressBar.getProgress() + ", " + progressBar.getMax());
         }
     }
 

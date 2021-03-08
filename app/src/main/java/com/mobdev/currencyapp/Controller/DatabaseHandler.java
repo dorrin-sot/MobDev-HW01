@@ -73,12 +73,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         Cursor cursor = db.query(TABLE_COINS, new String[] {
                         KEY_NAME,KEY_SYM, KEY_RANK, KEY_PRICE, KEY_P_C_H, KEY_P_C_D,KEY_P_C_W,KEY_URL }, KEY_ID + "=?",
                 new String[] { String.valueOf(rank) }, null, null, null, null);
-        if (cursor != null)
+        if (cursor != null) {
             cursor.moveToFirst();
-
-        Coin coin = new Coin(cursor.getString(0),cursor.getString(1),Integer.parseInt(cursor.getString(2)),Integer.parseInt(cursor.getString(2)),cursor.getString(7),Double.parseDouble(cursor.getString(3)),Double.parseDouble(cursor.getString(4)),Double.parseDouble(cursor.getString(5)),Double.parseDouble(cursor.getString(6)));
-        // return contact
-        return coin;
+            Coin coin = new Coin(cursor.getString(0), cursor.getString(1), Integer.parseInt(cursor.getString(2)), Integer.parseInt(cursor.getString(2)), cursor.getString(7), Double.parseDouble(cursor.getString(3)), Double.parseDouble(cursor.getString(4)), Double.parseDouble(cursor.getString(5)), Double.parseDouble(cursor.getString(6)));
+            return coin;
+        }
+        return new Coin("","",1,1,"",0,0,0,0);
     }
 
     // code to get all contacts in a list view
@@ -138,9 +138,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String countQuery = "SELECT  * FROM " + TABLE_COINS;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(countQuery, null);
+        int count= cursor.getCount();;
         cursor.close();
 
         // return count
-        return cursor.getCount();
+        return count;
     }
 }

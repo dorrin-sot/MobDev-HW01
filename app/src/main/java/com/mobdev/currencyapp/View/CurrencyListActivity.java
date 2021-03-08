@@ -214,9 +214,9 @@ public class CurrencyListActivity extends AppCompatActivity {
             if (ni.getTypeName().equalsIgnoreCase("WIFI"))
                 if (ni.isConnected())
                     haveConnectedWifi = true;
-//            if (ni.getTypeName().equalsIgnoreCase("MOBILE"))
-//                if (ni.isConnected())
-//                    haveConnectedMobile = true;
+            if (ni.getTypeName().equalsIgnoreCase("MOBILE"))
+                if (ni.isConnected())
+                    haveConnectedMobile = true;
         }
         return haveConnectedWifi || haveConnectedMobile;
     }

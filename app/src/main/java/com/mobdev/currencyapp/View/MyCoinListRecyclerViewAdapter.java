@@ -86,7 +86,7 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
         Glide.with(context)
                 .load(coin.getLogoURL()) // Image URL
                 .centerCrop() // Image scale type
-                .override(100, 100) // Resize image
+                .override(100) // Resize image
                 .placeholder(drawable.coin_icon) // Place holder image
                 .into(coinIcon); // ImageView to display image
     }
@@ -152,7 +152,7 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
 
     public synchronized void addCoinObj(Coin coin) {
         coins.put(coin.getRank(), coin);
-        notifyItemChanged(coin.getRank() - 1);
+        notifyItemChanged(coin.getId() - 1);
     }
 
     public static synchronized HashMap<Integer, Coin> getCoins() {

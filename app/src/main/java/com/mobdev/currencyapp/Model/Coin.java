@@ -1,17 +1,15 @@
 package com.mobdev.currencyapp.Model;
 
-import android.annotation.SuppressLint;
-
 import androidx.annotation.RequiresApi;
 
 import com.github.mikephil.charting.data.CandleEntry;
-import com.mobdev.currencyapp.Controller.DatabaseHandler;
 import com.mobdev.currencyapp.View.CurrencyListActivity;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -25,6 +23,7 @@ import okhttp3.Response;
 import static android.os.Build.VERSION_CODES.O;
 import static java.lang.Math.random;
 import static java.lang.Math.toIntExact;
+import static java.lang.String.valueOf;
 
 public class Coin {
     static LinkedList<Coin> coinList = new LinkedList<>();
@@ -63,25 +62,63 @@ public class Coin {
         this.percentChange1W = percentChange1W;
     }
 
-    public static synchronized Coin getCoin(int id) {
+    public static Coin getCoin(int id) {
         // fixme do from server now just test
         // coinList.addLast();
         //  return coinList.getLast();
         //     CurrencyListActivity.dataBaseHandler.addCoin(new Coin("Bitcoin", "BTC", coinList.size()+1, rank, "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
         //           500000, rank, -0.255, 0.664
-         //));
-        Coin coin = constructCoin(id);
-        CurrencyListActivity.dataBaseHandler.addCoin(coin);
-        return CurrencyListActivity.dataBaseHandler.getCoin(id);
+        //));
+        Coin coin = constructCoin(id); // fixme uncomment if yasin says
+//        Coin coin = getCoinn(rank); // fixme comment if yasin says
+        coinList.addLast(coin);
+//        CurrencyListActivity.dataBaseHandler.addCoin(coin); //fixme uncomment
+        return coin;
+    }
+
+    // fixme comment if yasin says
+    private static Coin getCoinn(int rank) {
+        OkHttpClient coinClient = new OkHttpClient();
+        HttpUrl.Builder urlBuilder = HttpUrl.parse("https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest").newBuilder();
+        urlBuilder.addQueryParameter("start", valueOf(rank));
+        urlBuilder.addQueryParameter("limit", valueOf(1));
+        Request request = new Request.Builder()
+                .addHeader("X-CMC_PRO_API_KEY", "535516e0-3c6b-464b-ab71-d383cd6b85b6")
+                .addHeader("Accept", "application/json")
+                .url(urlBuilder.build().toString())
+                .build();
+        try {
+            Response coinResponse = coinClient.newCall(request).execute();
+            JSONObject coinData = new JSONObject(coinResponse.body().string())
+                    .getJSONArray("data").getJSONObject(0);
+
+            int id = coinData.getInt("id");
+
+            System.out.println("coinData " + rank + " = " + coinData);
+            return new Coin(
+                    coinData.getString("name"),
+                    coinData.getString("symbol"),
+                    id,
+                    rank,
+                    "https://s2.coinmarketcap.com/static/img/coins/64x64/" + id + ".png",
+                    coinData.getJSONObject("quote").getJSONObject("USD").getDouble("price"),
+                    coinData.getJSONObject("quote").getJSONObject("USD").getDouble("percent_change_1h"),
+                    coinData.getJSONObject("quote").getJSONObject("USD").getDouble("percent_change_24h"),
+                    coinData.getJSONObject("quote").getJSONObject("USD").getDouble("percent_change_7d")
+            );
+        } catch (IOException | JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @NotNull
     private static Coin constructCoin(int id) {
-        CountDownLatch lock = new CountDownLatch(2);
+        CountDownLatch lock = new CountDownLatch(1);
 
         final String[] name = new String[1];
         final String[] symbol = new String[1];
-        final String[] logoURL = new String[1];
+        final String[] logoURL = {"https://s2.coinmarketcap.com/static/img/coins/64x64/" + id + ".png"};
         final int[] rank = new int[1];
         final double[] currentPriceUSD = new double[1];
         final double[] percentChange1H = new double[1];
@@ -104,19 +141,12 @@ public class Coin {
             }
             lock.countDown();
         });
-        CurrencyListActivity.getExecuter().execute(()->{
-            try {
-                logoURL[0] = GetJSON(coinIoAPI, id, apiTtlte, apiKey).getString("logo");
-                System.out.println(logoURL[0]);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            lock.countDown();
-        });
 
         try {
             lock.await();
-            System.out.println("name:" + name[0] +
+            System.out.println(
+                    "id:" + id+
+                    "\nname:" + name[0] +
                     "\nsymbol:" + symbol[0]
                     + "\nrank:" + rank[0] + "\ncurrentprice:" + currentPriceUSD[0]
                     + "\npercentcahnge1w:" + percentChange1W[0]
@@ -133,12 +163,11 @@ public class Coin {
 
     // todo only for testing
     @RequiresApi(api = O)
-    @SuppressLint("DefaultLocale")
     public synchronized ArrayList<CandleEntry> generateRandomOHLCData(LocalDate start, LocalDate end) {
 
         ArrayList<CandleEntry> values = new ArrayList<>();
 
-        for (int i = toIntExact(end.toEpochDay() - 1); i >= toIntExact(start.toEpochDay()); i--) {
+        for (int i = toIntExact(end.toEpochDay()); i >= toIntExact(start.toEpochDay()); i--) {
             float multi = (100 + 1);
             float val = (float) (random() * 40) + multi;
 

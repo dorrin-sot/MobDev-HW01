@@ -107,7 +107,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }*/
 
     // code to update the single contact
-    public int updateCoin(Coin coin) {
+    public int updateContact(Coin coin) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();

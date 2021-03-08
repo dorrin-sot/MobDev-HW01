@@ -8,22 +8,19 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.mobdev.currencyapp.Model.Coin;
 
-public class DatabaseHandler extends SQLiteOpenHelper {
-
+public class CandleDataBaseHandler extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 3;
     private static final String DATABASE_NAME = "coinsManager";
-    private static final String TABLE_COINS = "coins";
+    private static final String TABLE_COINS = "candles";
     private static final String KEY_ID = "id";
-    private static final String KEY_NAME = "name";
-    private static final String KEY_SYM = "symbol";
-    private static final String KEY_RANK = "rank";
-    private static final String KEY_PRICE = "price";
-    private static final String KEY_P_C_H = "percent_hour";
-    private static final String KEY_P_C_D = "percent_day";
-    private static final String KEY_P_C_W = "percent_week";
-    private static final String KEY_URL = "icon";
+    private static final String KEY_DATE = "date";
+    private static final String KEY_OPEN = "open";
+    private static final String KEY_CLOSE = "close";
+    private static final String KEY_HIGH = "high";
+    private static final String KEY_LOW = "low";
 
-    public DatabaseHandler(Context context) {
+
+    public CandleDataBaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         //3rd argument to be passed is CursorFactory instance
     }
@@ -31,8 +28,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String CREATE_COINS_TABLE = "CREATE TABLE " + TABLE_COINS + "("+ KEY_ID + " INTEGER PRIMARY KEY,"
-                + KEY_NAME + " TEXT," + KEY_SYM + " TEXT,"
-                + KEY_RANK + " INTEGER," + KEY_PRICE + " REAL," + KEY_P_C_H + " REAL," + KEY_P_C_D + " REAL,"+KEY_P_C_W+" REAL,"+KEY_URL+" TEXT" + ")";
+                + KEY_DATE+ " DATE," + KEY_OPEN + " REAL,"
+                + KEY_CLOSE + " REAL," + KEY_HIGH + " REAL," + KEY_LOW + " REAL"  + ")";
         db.execSQL(CREATE_COINS_TABLE);
     }
 
@@ -47,18 +44,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     // code to add the new contact
-    public void addCoin(Coin coin) {
+    public void addCandle(Coin coin) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(KEY_NAME, coin.getName());
-        values.put(KEY_SYM, coin.getSymbol());
-        values.put(KEY_RANK, coin.getRank());
-        values.put(KEY_PRICE, coin.getCurrentPriceUSD());
-        values.put(KEY_P_C_H, coin.getPercentChange1H());
-        values.put(KEY_P_C_D, coin.getPercentChange1D());
-        values.put(KEY_P_C_W, coin.getPercentChange1W());
-        values.put(KEY_URL, coin.getLogoURL());
+        values.put(KEY_DATE, coin.getName());
+        values.put(KEY_OPEN, coin.getSymbol());
+        values.put(KEY_CLOSE, coin.getRank());
+        values.put(KEY_HIGH, coin.getCurrentPriceUSD());
+        values.put(KEY_LOW, coin.getPercentChange1H());
 
         // Inserting Row
         db.insert(TABLE_COINS, null, values);
@@ -71,7 +65,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = db.query(TABLE_COINS, new String[] {
-                        KEY_NAME,KEY_SYM, KEY_RANK, KEY_PRICE, KEY_P_C_H, KEY_P_C_D,KEY_P_C_W,KEY_URL }, KEY_ID + "=?",
+                        KEY_DATE,KEY_OPEN, KEY_CLOSE, KEY_HIGH, KEY_LOW}, KEY_DATE + "=?",
                 new String[] { String.valueOf(rank) }, null, null, null, null);
         if (cursor != null)
             cursor.moveToFirst();
@@ -107,18 +101,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }*/
 
     // code to update the single contact
-    public int updateContact(Coin coin) {
+    public int updateCoin(Coin coin) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(KEY_NAME, coin.getName());
-        values.put(KEY_SYM, coin.getSymbol());
-        values.put(KEY_RANK, coin.getRank());
-        values.put(KEY_PRICE, coin.getCurrentPriceUSD());
-        values.put(KEY_P_C_H, coin.getPercentChange1H());
-        values.put(KEY_P_C_D, coin.getPercentChange1D());
-        values.put(KEY_P_C_W, coin.getPercentChange1W());
-        values.put(KEY_URL, coin.getLogoURL());
+        values.put(KEY_DATE, coin.getName());
+        values.put(KEY_OPEN, coin.getSymbol());
+        values.put(KEY_CLOSE, coin.getRank());
+        values.put(KEY_HIGH, coin.getCurrentPriceUSD());
+        values.put(KEY_LOW, coin.getPercentChange1H());
 
         // updating row
         return db.update(TABLE_COINS, values, KEY_ID + " = ?",

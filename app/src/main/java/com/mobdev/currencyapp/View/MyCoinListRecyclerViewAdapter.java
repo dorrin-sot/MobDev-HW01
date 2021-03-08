@@ -152,7 +152,7 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
 
     public synchronized void addCoinObj(Coin coin) {
         coins.put(coin.getRank(), coin);
-        notifyItemChanged(coin.getRank() - 1);
+        notifyItemChanged(coin.getId() - 1);
     }
 
     public static synchronized HashMap<Integer, Coin> getCoins() {

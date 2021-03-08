@@ -62,17 +62,17 @@ public class Coin {
         this.percentChange1W = percentChange1W;
     }
 
-    public static Coin getCoin(int rank) {
+    public static Coin getCoin(int id) {
         // fixme do from server now just test
         // coinList.addLast();
         //  return coinList.getLast();
         //     CurrencyListActivity.dataBaseHandler.addCoin(new Coin("Bitcoin", "BTC", coinList.size()+1, rank, "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
         //           500000, rank, -0.255, 0.664
         //));
-//        Coin coin = constructCoin(id); // fixme uncomment if yasin says
-        Coin coin = getCoinn(rank); // fixme comment if yasin says
+        Coin coin = constructCoin(id); // fixme uncomment if yasin says
+//        Coin coin = getCoinn(rank); // fixme comment if yasin says
         coinList.addLast(coin);
-        CurrencyListActivity.dataBaseHandler.addCoin(coin); //fixme uncomment
+//        CurrencyListActivity.dataBaseHandler.addCoin(coin); //fixme uncomment
         return coin;
     }
 
@@ -114,11 +114,11 @@ public class Coin {
 
     @NotNull
     private static Coin constructCoin(int id) {
-        CountDownLatch lock = new CountDownLatch(2);
+        CountDownLatch lock = new CountDownLatch(1);
 
         final String[] name = new String[1];
         final String[] symbol = new String[1];
-        final String[] logoURL = new String[1];
+        final String[] logoURL = {"https://s2.coinmarketcap.com/static/img/coins/64x64/" + id + ".png"};
         final int[] rank = new int[1];
         final double[] currentPriceUSD = new double[1];
         final double[] percentChange1H = new double[1];
@@ -141,19 +141,12 @@ public class Coin {
             }
             lock.countDown();
         });
-        CurrencyListActivity.getExecuter().execute(()->{
-            try {
-                logoURL[0] = GetJSON(coinIoAPI, id, apiTtlte, apiKey).getString("logo");
-                System.out.println(logoURL[0]);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            lock.countDown();
-        });
 
         try {
             lock.await();
-            System.out.println("name:" + name[0] +
+            System.out.println(
+                    "id:" + id+
+                    "\nname:" + name[0] +
                     "\nsymbol:" + symbol[0]
                     + "\nrank:" + rank[0] + "\ncurrentprice:" + currentPriceUSD[0]
                     + "\npercentcahnge1w:" + percentChange1W[0]

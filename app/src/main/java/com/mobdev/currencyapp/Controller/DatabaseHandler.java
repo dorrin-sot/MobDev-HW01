@@ -75,7 +75,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 new String[] { String.valueOf(rank) }, null, null, null, null);
         if (cursor != null)
             cursor.moveToFirst();
-
+cursor.
         Coin coin = new Coin(cursor.getString(0),cursor.getString(1),Integer.parseInt(cursor.getString(2)),Integer.parseInt(cursor.getString(2)),cursor.getString(7),Double.parseDouble(cursor.getString(3)),Double.parseDouble(cursor.getString(4)),Double.parseDouble(cursor.getString(5)),Double.parseDouble(cursor.getString(6)));
         // return contact
         return coin;

@@ -103,6 +103,7 @@ public class CurrencyListActivity extends AppCompatActivity {
         AtomicBoolean loadFromCache = new AtomicBoolean(false),
                 buttonClicked = new AtomicBoolean(false);
         AtomicInteger numberOfDialogsOpened = new AtomicInteger();
+
         handler = new Handler(Looper.getMainLooper(), msg -> {
             switch (msg.what) {
                 case loadCoins: {
@@ -130,19 +131,22 @@ public class CurrencyListActivity extends AppCompatActivity {
                                 if (loadFromCache.get()) {
                                     coin = dataBaseHandler.getCoin(finalRank);
 
+                                    Coin finalCoin = coin;
                                     runOnUiThread(() -> {
-                                        adapter.addCoinObj(coin);
+                                        adapter.addCoinObj(finalCoin);
                                         addProgress();
                                     });
-                                } else if (isConnectedToInternet()) {
+                                }
+                                if (isConnectedToInternet()) {
                                     coin = getCoin(finalRank);
 //                                    if (dataBaseHandler.coinExists(coin))
 //                                        dataBaseHandler.updateCoin(coin);
 //                                    else
                                     dataBaseHandler.addCoin(coin);
 
+                                    Coin finalCoin1 = coin;
                                     runOnUiThread(() -> {
-                                        adapter.addCoinObj(coin);
+                                        adapter.addCoinObj(finalCoin1);
                                         addProgress();
                                     });
                                 }

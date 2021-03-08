@@ -191,9 +191,9 @@ public class Coin {
         try {
             Response response = client.newCall(request).execute();
             JSONObject data = new JSONObject(response.body().string()).getJSONObject("data").getJSONObject("" + id + "");
-            int errorCode = new JSONObject(response.body().string()).getJSONObject("status").getInt("error_code");
-            if (errorCode != 0)
-                System.out.println("errorCode = " + errorCode);
+//            int errorCode = new JSONObject(response.body().string()).getJSONObject("status").getInt("error_code");
+//            if (errorCode != 0)
+//                System.out.println("errorCode = " + errorCode);
             return data;
         } catch (Exception e) {
             e.printStackTrace();

@@ -71,6 +71,7 @@ public class Coin {
         //));
         Coin coin = constructCoin(id); // fixme uncomment if yasin says
 //        Coin coin = getCoinn(rank); // fixme comment if yasin says
+        System.out.println("OOOOOOOOOOOOOOOOOOOOOOO "+coin.getName());
         coinList.addLast(coin);
 //        CurrencyListActivity.dataBaseHandler.addCoin(coin); //fixme uncomment
         return coin;

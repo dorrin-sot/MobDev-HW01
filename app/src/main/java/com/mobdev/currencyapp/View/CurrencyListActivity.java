@@ -135,9 +135,9 @@ public class CurrencyListActivity extends AppCompatActivity {
                                     });
                                 } else if (isConnectedToInternet()) {
                                     coin = getCoin(finalRank);
-                                 //   if (dataBaseHandler.coinExists(coin))
-                                 //       dataBaseHandler.updateCoin(coin);
-                                  //  else
+//                                    if (dataBaseHandler.coinExists(coin))
+//                                        dataBaseHandler.updateCoin(coin);
+//                                    else
                                         dataBaseHandler.addCoin(coin);
 
                                     runOnUiThread(() -> {
@@ -225,11 +225,10 @@ public class CurrencyListActivity extends AppCompatActivity {
         return !isConnectedToInternet() || dataBaseHandler.getCoinCount() != 0;
     }
 
-    @RequiresApi(api = N)
-    public boolean coinHasBeenCachedBefore(Coin coin) {
-       // return dataBaseHandler.coinExists(coin);
-        return true;
-    }
+//    @RequiresApi(api = N)
+//    public boolean coinHasBeenCachedBefore(Coin coin) {
+//        return dataBaseHandler.coinExists(coin);
+//    }
 
     public static Handler getHandler() {
         return handler;

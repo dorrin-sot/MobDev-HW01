@@ -114,7 +114,6 @@ public class Coin {
 
     @NotNull
     private static Coin constructCoin(int id) {
-        CountDownLatch lock = new CountDownLatch(1);
 
         final String[] name = new String[1];
         final String[] symbol = new String[1];
@@ -125,35 +124,27 @@ public class Coin {
         final double[] percentChange1D = new double[1];
         final double[] percentChange1W = new double[1];
 
-        CurrencyListActivity.getExecuter().execute(()->{
-            JSONObject data = GetJSON(marketCapAPI, id, apiTtlte, apiKey);
-            try {
-                name[0] = data.getString("name");
-                symbol[0] = data.getString("symbol");
-                rank[0] = data.getInt("cmc_rank");
-                JSONObject USD_converted = data.getJSONObject("quote").getJSONObject("USD");
-                currentPriceUSD[0] = USD_converted.getDouble("price");
-                percentChange1H[0] = USD_converted.getDouble("percent_change_1h");
-                percentChange1D[0] = USD_converted.getDouble("percent_change_24h");
-                percentChange1W[0] = USD_converted.getDouble("percent_change_7d");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            lock.countDown();
-        });
 
+        JSONObject data = GetJSON(marketCapAPI, id, apiTtlte, apiKey);
         try {
-            lock.await();
-            System.out.println(
-                    "id:" + id+
-                    "\nname:" + name[0] +
-                    "\nsymbol:" + symbol[0]
-                    + "\nrank:" + rank[0] + "\ncurrentprice:" + currentPriceUSD[0]
-                    + "\npercentcahnge1w:" + percentChange1W[0]
-                    + "\nlogourl: " + logoURL[0]);
-        } catch (InterruptedException e) {
+            name[0] = data.getString("name");
+            symbol[0] = data.getString("symbol");
+            rank[0] = data.getInt("cmc_rank");
+            JSONObject USD_converted = data.getJSONObject("quote").getJSONObject("USD");
+            currentPriceUSD[0] = USD_converted.getDouble("price");
+            percentChange1H[0] = USD_converted.getDouble("percent_change_1h");
+            percentChange1D[0] = USD_converted.getDouble("percent_change_24h");
+            percentChange1W[0] = USD_converted.getDouble("percent_change_7d");
+        } catch (JSONException e) {
             e.printStackTrace();
         }
+        System.out.println(
+                "id:" + id+
+                "\nname:" + name[0] +
+                "\nsymbol:" + symbol[0]
+                + "\nrank:" + rank[0] + "\ncurrentprice:" + currentPriceUSD[0]
+                + "\npercentcahnge1w:" + percentChange1W[0]
+                + "\nlogourl: " + logoURL[0]);
         return new Coin(name[0],symbol[0],id,rank[0],logoURL[0],currentPriceUSD[0],percentChange1H[0],percentChange1D[0],percentChange1W[0]);
     }
 

@@ -67,7 +67,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     // code to get the single contact
-    public Coin getCoin(int rank) {
+    public synchronized Coin getCoin(int rank) {
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = db.query(TABLE_COINS, new String[] {

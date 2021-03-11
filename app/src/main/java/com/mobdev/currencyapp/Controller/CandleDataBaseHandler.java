@@ -13,6 +13,7 @@ public class CandleDataBaseHandler extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "coinsManager";
     private static final String TABLE_COINS = "candles";
     private static final String KEY_ID = "id";
+    private static final String KEY_COIN_ID = "coinId";
     private static final String KEY_DATE = "date";
     private static final String KEY_OPEN = "open";
     private static final String KEY_CLOSE = "close";
@@ -29,7 +30,7 @@ public class CandleDataBaseHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String CREATE_COINS_TABLE = "CREATE TABLE " + TABLE_COINS + "("+ KEY_ID + " INTEGER PRIMARY KEY,"
                 + KEY_DATE+ " DATE," + KEY_OPEN + " REAL,"
-                + KEY_CLOSE + " REAL," + KEY_HIGH + " REAL," + KEY_LOW + " REAL"  + ")";
+                + KEY_CLOSE + " REAL," + KEY_HIGH + " REAL," + KEY_LOW + " REAL," +KEY_COIN_ID+" TEXT" + ")";
         db.execSQL(CREATE_COINS_TABLE);
     }
 
@@ -53,6 +54,7 @@ public class CandleDataBaseHandler extends SQLiteOpenHelper {
         values.put(KEY_CLOSE, coin.getRank());
         values.put(KEY_HIGH, coin.getCurrentPriceUSD());
         values.put(KEY_LOW, coin.getPercentChange1H());
+        values.put(KEY_COIN_ID, coin.getId());
 
         // Inserting Row
         db.insert(TABLE_COINS, null, values);

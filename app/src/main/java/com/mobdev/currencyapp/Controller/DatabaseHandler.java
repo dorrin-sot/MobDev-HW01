@@ -77,18 +77,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     // code to get the single contact
-    public synchronized Coin getCoin(int rank) {
+    public synchronized Coin getCoin(int id) {
         SQLiteDatabase db = getInstance(context).getReadableDatabase();
 
         Cursor cursor = db.query(TABLE_COINS, new String[] {
                         KEY_NAME,KEY_SYM, KEY_RANK, KEY_PRICE, KEY_P_C_H, KEY_P_C_D,KEY_P_C_W,KEY_URL }, KEY_ID + "=?",
-                new String[] { String.valueOf(rank) }, null, null, null, null);
+                new String[] { String.valueOf(id) }, null, null, null, null);
         if (cursor != null) {
             cursor.moveToFirst();
-            Coin coin = new Coin(cursor.getString(0), cursor.getString(1), Integer.parseInt(cursor.getString(2)), Integer.parseInt(cursor.getString(2)), cursor.getString(7), Double.parseDouble(cursor.getString(3)), Double.parseDouble(cursor.getString(4)), Double.parseDouble(cursor.getString(5)), Double.parseDouble(cursor.getString(6)));
+            Coin coin = new Coin(cursor.getString(0), cursor.getString(1), id, Integer.parseInt(cursor.getString(2)), cursor.getString(7), Double.parseDouble(cursor.getString(3)), Double.parseDouble(cursor.getString(4)), Double.parseDouble(cursor.getString(5)), Double.parseDouble(cursor.getString(6)));
             return coin;
         }
-        return new Coin("","",1,1,"",0,0,0,0);
+        return null;
     }
 
     // code to get all contacts in a list view

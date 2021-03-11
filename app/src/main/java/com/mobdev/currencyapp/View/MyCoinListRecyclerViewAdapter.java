@@ -18,6 +18,7 @@ import java.text.DecimalFormat;
 import java.util.HashMap;
 
 import static android.os.Build.VERSION_CODES.M;
+import static android.os.Build.VERSION_CODES.N;
 import static android.view.LayoutInflater.from;
 import static androidx.core.content.ContextCompat.getColor;
 import static com.mobdev.currencyapp.Model.Coin.clearCoinList;
@@ -148,7 +149,9 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
         }
     }
 
+    @RequiresApi(api = N)
     public synchronized void addCoinObj(Coin coin) {
+        coins.remove(0);
         coins.put(coin.getId(), coin);
         notifyItemChanged(coin.getId() - 1);
     }

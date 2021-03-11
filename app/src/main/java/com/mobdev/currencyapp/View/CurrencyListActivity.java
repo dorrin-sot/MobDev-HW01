@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -70,7 +71,7 @@ public class CurrencyListActivity extends AppCompatActivity {
                 .override(1500)
                 .placeholder(drawable.no_connection)
                 .into(noConnectionImgView);
-        noConnectionImgView.setVisibility(shouldShowNoInternetPic() ? VISIBLE:INVISIBLE);
+        noConnectionImgView.setVisibility(shouldShowNoInternetPic() ? VISIBLE : INVISIBLE);
 
         System.out.println("isConnectedToInternet() = " + isConnectedToInternet());
 
@@ -93,7 +94,7 @@ public class CurrencyListActivity extends AppCompatActivity {
         Message message = new Message();
         message.what = loadCoins;
         message.arg1 = getCoins().size() + 1; // start
-        message.arg2 = 2; // number of coins to load
+        message.arg2 = 10; // number of coins to load
         handler.sendMessage(message);
     }
 
@@ -102,13 +103,13 @@ public class CurrencyListActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        AtomicBoolean loadFromCache = new AtomicBoolean(false),
-                buttonClicked = new AtomicBoolean(false);
+        AtomicBoolean loadFromCache = new AtomicBoolean(false), buttonClicked = new AtomicBoolean(false);
         AtomicInteger numberOfDialogsOpened = new AtomicInteger();
 
         handler = new Handler(Looper.getMainLooper(), msg -> {
             switch (msg.what) {
                 case loadCoins: {
+//                    setAllButtonEnabled(false);
                     if (!buttonClicked.get()) {
                         buttonClicked.set(true);
 
@@ -130,7 +131,19 @@ public class CurrencyListActivity extends AppCompatActivity {
                                 if "n" internet     "y" cache   get from cache
                                 if "y" internet                 get from api
                                  */
-                                if (loadFromCache.get()) {
+                                if (isConnectedToInternet()) {
+                                    coin = getCoin(finalRank);
+//                                    if (dataBaseHandler.coinExists(finalRank))
+//                                        dataBaseHandler.updateContact(coin);
+//                                    else
+//                                        dataBaseHandler.addCoin(coin);
+
+                                    Coin finalCoin = coin;
+                                    runOnUiThread(() -> {
+                                        adapter.addCoinObj(finalCoin);
+                                        addProgress();
+                                    });
+                                } else {
                                     if (dataBaseHandler.coinExists(finalRank)) {
                                         coin = dataBaseHandler.getCoin(finalRank);
                                         Coin finalCoin = coin;
@@ -144,26 +157,15 @@ public class CurrencyListActivity extends AppCompatActivity {
                                                 Toast.makeText(this, "Cannot Connect To The Internet", LENGTH_LONG).show()
                                         );
                                 }
-                                if (isConnectedToInternet()) {
-                                    coin = getCoin(finalRank);
-                                    if (dataBaseHandler.coinExists(finalRank))
-                                        dataBaseHandler.updateContact(coin);
-                                    else
-                                        dataBaseHandler.addCoin(coin);
-
-                                    Coin finalCoin1 = coin;
-                                    runOnUiThread(() -> {
-                                        adapter.addCoinObj(finalCoin1);
-                                        addProgress();
-                                    });
-                                }
+                                buttonClicked.set(false);
+//                    setAllButtonEnabled(true);
                             });
                         }
-                        buttonClicked.set(false);
                     }
                 }
                 break;
                 case openOhlcPage: {
+//                    setAllButtonEnabled(false);
                     if (!buttonClicked.get()) {
                         buttonClicked.set(true);
 
@@ -188,15 +190,29 @@ public class CurrencyListActivity extends AppCompatActivity {
                                 System.out.println("tag = " + tag);
                                 ohlcDialog.show(getSupportFragmentManager(), tag);
                             });
+                            buttonClicked.set(false);
+//                    setAllButtonEnabled(true);
                         });
-                        buttonClicked.set(false);
                     }
                 }
                 break;
                 default:
                     throw new IllegalStateException("Unexpected value: " + msg.what);
             }
+//            new Timer().schedule(new TimerTask() {
+//                @Override
+//                public void run() {
+//                    buttonClicked.set(false);
+//                }
+//            }, 500);
             return true;
+        });
+    }
+
+    private void setAllButtonEnabled(boolean enabled) {
+        runOnUiThread(() -> {
+            ((Button) findViewById(id.loadNext10Btn)).setEnabled(enabled);
+            ((Button) findViewById(id.refreshBtn)).setEnabled(enabled);
         });
     }
 

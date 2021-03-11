@@ -19,6 +19,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 import static android.os.Build.VERSION_CODES.O;
+import static com.mobdev.currencyapp.View.CurrencyListActivity.dataBaseHandler;
 import static java.lang.Math.random;
 import static java.lang.Math.toIntExact;
 import static java.lang.String.valueOf;
@@ -61,20 +62,15 @@ public class Coin {
     }
 
     public static Coin getCoin(int id) {
-        // fixme do from server now just test
-        // coinList.addLast();
-        //  return coinList.getLast();
-        //     CurrencyListActivity.dataBaseHandler.addCoin(new Coin("Bitcoin", "BTC", coinList.size()+1, rank, "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
-        //           500000, rank, -0.255, 0.664
-        //));
-        Coin coin = constructCoin(id); // fixme uncomment if yasin says
-//        Coin coin = getCoinn(rank); // fixme comment if yasin says
+        Coin coin = constructCoin(id);
         coinList.addLast(coin);
-//        CurrencyListActivity.dataBaseHandler.addCoin(coin); //fixme uncomment
+        if (dataBaseHandler.coinExists(id))
+            dataBaseHandler.updateContact(coin);
+        else
+            dataBaseHandler.addCoin(coin);
         return coin;
     }
 
-    // fixme comment if yasin says
     private static Coin getCoinn(int rank) {
         OkHttpClient coinClient = new OkHttpClient();
         HttpUrl.Builder urlBuilder = HttpUrl.parse("https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest").newBuilder();
@@ -123,11 +119,11 @@ public class Coin {
 
 
         JSONObject data = GetJSON(marketCapAPI, id, apiTtlte, apiKey);
-        System.out.println(data);
+        System.out.println("data=" + data);
         try {
             name[0] = data.getString("name");
             symbol[0] = data.getString("symbol");
-            rank[0] = data.getInt("cmc_rank");
+            rank[0] = id;
             JSONObject USD_converted = data.getJSONObject("quote").getJSONObject("USD");
             currentPriceUSD[0] = USD_converted.getDouble("price");
             percentChange1H[0] = USD_converted.getDouble("percent_change_1h");

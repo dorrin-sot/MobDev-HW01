@@ -51,9 +51,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
+        values.put(KEY_ID, coin.getId());
         values.put(KEY_NAME, coin.getName());
         values.put(KEY_SYM, coin.getSymbol());
-        values.put(KEY_RANK, coin.getRank());
+        values.put(KEY_RANK, 0);
         values.put(KEY_PRICE, coin.getCurrentPriceUSD());
         values.put(KEY_P_C_H, coin.getPercentChange1H());
         values.put(KEY_P_C_D, coin.getPercentChange1D());
@@ -63,7 +64,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         // Inserting Row
         db.insert(TABLE_COINS, null, values);
         //2nd argument is String containing nullColumnHack
-        db.close(); // Closing database connection
+//        db.close(); // Closing database connection
     }
 
     // code to get the single contact
@@ -113,7 +114,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(KEY_NAME, coin.getName());
         values.put(KEY_SYM, coin.getSymbol());
-        values.put(KEY_RANK, coin.getRank());
+        values.put(KEY_RANK, 0);
+        values.put(KEY_ID, coin.getId());
         values.put(KEY_PRICE, coin.getCurrentPriceUSD());
         values.put(KEY_P_C_H, coin.getPercentChange1H());
         values.put(KEY_P_C_D, coin.getPercentChange1D());
@@ -130,7 +132,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_COINS, KEY_ID + " = ?",
                 new String[] { String.valueOf(coin.getId()) });
-        db.close();
+//        db.close();
     }
 
     // Getting contacts Count
@@ -143,5 +145,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         // return count
         return count;
+    }
+
+    public boolean coinExists(int id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM coins WHERE id=?", new String[]{String.valueOf(id)});
+        return cursor.moveToFirst();
     }
 }

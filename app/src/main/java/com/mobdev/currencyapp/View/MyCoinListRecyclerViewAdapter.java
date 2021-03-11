@@ -67,7 +67,6 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
         position++;
         Coin coin = coins.get(position);
         if (coin == null) return;
-        System.out.println(position + " " + coin + " " + coin.getRank());
         holder.coin = coin;
 //        holder.coinRank.setText(valueOf(coin.getRank()));
         setCoinIcon(coin, holder.coinIcon);
@@ -150,7 +149,7 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
     }
 
     public synchronized void addCoinObj(Coin coin) {
-        coins.put(coin.getRank(), coin);
+        coins.put(coin.getId(), coin);
         notifyItemChanged(coin.getId() - 1);
     }
 

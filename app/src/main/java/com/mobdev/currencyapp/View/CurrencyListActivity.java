@@ -11,6 +11,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -34,6 +35,7 @@ import static android.os.Build.VERSION_CODES.N;
 import static android.os.Build.VERSION_CODES.O;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
+import static android.widget.Toast.LENGTH_LONG;
 import static androidx.recyclerview.widget.DividerItemDecoration.VERTICAL;
 import static com.mobdev.currencyapp.Model.Coin.getCoin;
 import static com.mobdev.currencyapp.R.drawable;
@@ -66,7 +68,7 @@ public class CurrencyListActivity extends AppCompatActivity {
                 .override(1500)
                 .placeholder(drawable.no_connection)
                 .into(noConnectionImgView);
-        noConnectionImgView.setVisibility(isConnectedToInternet() ? INVISIBLE : VISIBLE);
+        noConnectionImgView.setVisibility(shouldShowNoInternetPic() ? VISIBLE:INVISIBLE);
 
         System.out.println("isConnectedToInternet() = " + isConnectedToInternet());
 
@@ -91,7 +93,7 @@ public class CurrencyListActivity extends AppCompatActivity {
         Message message = new Message();
         message.what = loadCoins;
         message.arg1 = getCoins().size() + 1; // start
-        message.arg2 = 2; // number of coins to load
+        message.arg2 = 10; // number of coins to load
         handler.sendMessage(message);
     }
 
@@ -116,7 +118,7 @@ public class CurrencyListActivity extends AppCompatActivity {
                             progressBar.setProgress(0, true);
                             progressBar.setMax(num);
                             progressBar.setVisibility(VISIBLE);
-                            findViewById(id.noConnectionImg).setVisibility(shouldShowNoInternetPic() ? VISIBLE:INVISIBLE);
+                            findViewById(id.noConnectionImg).setVisibility(shouldShowNoInternetPic() ? VISIBLE : INVISIBLE);
                         });
                         loadFromCache.set(canLoadFromCache());
                         for (int rank = start; rank < end; rank++) {
@@ -128,21 +130,27 @@ public class CurrencyListActivity extends AppCompatActivity {
                                 if "n" internet     "y" cache   get from cache
                                 if "y" internet                 get from api
                                  */
-                                if (loadFromCache.get() && dataBaseHandler.coinExists(finalRank)) {
-                                    coin = dataBaseHandler.getCoin(finalRank);
-                                    System.out.println("this is "+coin.getName());
-                                    Coin finalCoin = coin;
-                                    runOnUiThread(() -> {
-                                        adapter.addCoinObj(finalCoin);
-                                        addProgress();
-                                    });
+                                if (loadFromCache.get()) {
+                                    if (dataBaseHandler.coinExists(finalRank)) {
+                                        coin = dataBaseHandler.getCoin(finalRank);
+                                        System.out.println("this is "+coin.getName());
+
+                                        Coin finalCoin = coin;
+                                        runOnUiThread(() -> {
+                                            adapter.addCoinObj(finalCoin);
+                                            addProgress();
+                                        });
+                                    } else
+                                        runOnUiThread(() ->
+                                                Toast.makeText(this, "Cannot Connect To The Internet", LENGTH_LONG).show()
+                                        );
                                 }
                                 if (isConnectedToInternet()) {
                                     coin = getCoin(finalRank);
                                     if (dataBaseHandler.coinExists(finalRank))
                                         dataBaseHandler.updateContact(coin);
                                     else
-                                    dataBaseHandler.addCoin(coin);
+                                        dataBaseHandler.addCoin(coin);
 
                                     Coin finalCoin1 = coin;
                                     runOnUiThread(() -> {
@@ -194,7 +202,7 @@ public class CurrencyListActivity extends AppCompatActivity {
     }
 
     private boolean shouldShowNoInternetPic() {
-        return !isConnectedToInternet() && dataBaseHandler.getCoinCount()==0;
+        return !isConnectedToInternet() && dataBaseHandler.getCoinCount() == 0;
     }
 
     @RequiresApi(api = N)

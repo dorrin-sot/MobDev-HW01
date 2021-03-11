@@ -22,9 +22,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_P_C_D = "percent_day";
     private static final String KEY_P_C_W = "percent_week";
     private static final String KEY_URL = "icon";
+    private static DatabaseHandler instance;
+    private Context context;
+    public static synchronized DatabaseHandler getInstance(Context context)
+    {
+        if (instance == null)
+            instance = new DatabaseHandler(context);
 
-    public DatabaseHandler(Context context) {
+        return instance;
+    }
+    private DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        this.context=context;
         //3rd argument to be passed is CursorFactory instance
     }
     // Creating Tables
@@ -48,7 +57,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     // code to add the new contact
     public void addCoin(Coin coin) {
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = getInstance(context).getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(KEY_ID, coin.getId());
@@ -64,12 +73,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         // Inserting Row
         db.insert(TABLE_COINS, null, values);
         //2nd argument is String containing nullColumnHack
-//        db.close(); // Closing database connection
+        db.close(); // Closing database connection
     }
 
     // code to get the single contact
     public synchronized Coin getCoin(int rank) {
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = getInstance(context).getReadableDatabase();
 
         Cursor cursor = db.query(TABLE_COINS, new String[] {
                         KEY_NAME,KEY_SYM, KEY_RANK, KEY_PRICE, KEY_P_C_H, KEY_P_C_D,KEY_P_C_W,KEY_URL }, KEY_ID + "=?",
@@ -109,7 +118,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     // code to update the single contact
     public int updateContact(Coin coin) {
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = getInstance(context).getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(KEY_NAME, coin.getName());
@@ -132,13 +141,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_COINS, KEY_ID + " = ?",
                 new String[] { String.valueOf(coin.getId()) });
-//        db.close();
+        db.close();
     }
 
     // Getting contacts Count
     public int getCoinCount() {
         String countQuery = "SELECT  * FROM " + TABLE_COINS;
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = getInstance(context).getReadableDatabase();
         Cursor cursor = db.rawQuery(countQuery, null);
         int count= cursor.getCount();;
         cursor.close();
@@ -148,7 +157,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     public boolean coinExists(int id) {
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = getInstance(context).getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM coins WHERE id=?", new String[]{String.valueOf(id)});
         return cursor.moveToFirst();
     }

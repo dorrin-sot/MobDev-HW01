@@ -70,7 +70,7 @@ public class CurrencyListActivity extends AppCompatActivity {
 
         System.out.println("isConnectedToInternet() = " + isConnectedToInternet());
 
-        dataBaseHandler = new DatabaseHandler(this);
+        dataBaseHandler = DatabaseHandler.getInstance(this);
 
         executer = (ThreadPoolExecutor) Executors.newFixedThreadPool(5);
 
@@ -91,7 +91,7 @@ public class CurrencyListActivity extends AppCompatActivity {
         Message message = new Message();
         message.what = loadCoins;
         message.arg1 = getCoins().size() + 1; // start
-        message.arg2 = 10; // number of coins to load
+        message.arg2 = 2; // number of coins to load
         handler.sendMessage(message);
     }
 
@@ -130,7 +130,7 @@ public class CurrencyListActivity extends AppCompatActivity {
                                  */
                                 if (loadFromCache.get() && dataBaseHandler.coinExists(finalRank)) {
                                     coin = dataBaseHandler.getCoin(finalRank);
-
+                                    System.out.println("this is "+coin.getName());
                                     Coin finalCoin = coin;
                                     runOnUiThread(() -> {
                                         adapter.addCoinObj(finalCoin);

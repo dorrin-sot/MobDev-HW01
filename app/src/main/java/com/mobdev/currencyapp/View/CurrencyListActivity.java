@@ -61,6 +61,8 @@ public class CurrencyListActivity extends AppCompatActivity {
         findViewById(id.loadNext10Btn).setOnClickListener(v -> loadNext10());
         findViewById(id.refreshBtn).setOnClickListener(v -> refreshAndStartOver());
 
+        dataBaseHandler = DatabaseHandler.getInstance(this);
+
         ImageView noConnectionImgView = (ImageView) findViewById(id.noConnectionImg);
         Glide.with(this)
                 .load("https://image.freepik.com/free-vector/no-internet-connection-sign_79145-136.jpg")
@@ -71,8 +73,6 @@ public class CurrencyListActivity extends AppCompatActivity {
         noConnectionImgView.setVisibility(shouldShowNoInternetPic() ? VISIBLE:INVISIBLE);
 
         System.out.println("isConnectedToInternet() = " + isConnectedToInternet());
-
-        dataBaseHandler = DatabaseHandler.getInstance(this);
 
         executer = (ThreadPoolExecutor) Executors.newFixedThreadPool(5);
 
@@ -93,7 +93,7 @@ public class CurrencyListActivity extends AppCompatActivity {
         Message message = new Message();
         message.what = loadCoins;
         message.arg1 = getCoins().size() + 1; // start
-        message.arg2 = 10; // number of coins to load
+        message.arg2 = 2; // number of coins to load
         handler.sendMessage(message);
     }
 
@@ -133,9 +133,8 @@ public class CurrencyListActivity extends AppCompatActivity {
                                 if (loadFromCache.get()) {
                                     if (dataBaseHandler.coinExists(finalRank)) {
                                         coin = dataBaseHandler.getCoin(finalRank);
-                                        System.out.println("this is "+coin.getName());
-
                                         Coin finalCoin = coin;
+                                        System.out.println(coin.getName());
                                         runOnUiThread(() -> {
                                             adapter.addCoinObj(finalCoin);
                                             addProgress();

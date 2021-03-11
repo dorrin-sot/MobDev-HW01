@@ -116,7 +116,7 @@ public class CurrencyListActivity extends AppCompatActivity {
                             progressBar.setProgress(0, true);
                             progressBar.setMax(num);
                             progressBar.setVisibility(VISIBLE);
-                            findViewById(id.noConnectionImg).setVisibility(isConnectedToInternet() ? INVISIBLE : VISIBLE);
+                            findViewById(id.noConnectionImg).setVisibility(shouldShowNoInternetPic() ? VISIBLE:INVISIBLE);
                         });
                         loadFromCache.set(canLoadFromCache());
                         for (int rank = start; rank < end; rank++) {
@@ -128,7 +128,7 @@ public class CurrencyListActivity extends AppCompatActivity {
                                 if "n" internet     "y" cache   get from cache
                                 if "y" internet                 get from api
                                  */
-                                if (loadFromCache.get()) {
+                                if (loadFromCache.get() && dataBaseHandler.coinExists(finalRank)) {
                                     coin = dataBaseHandler.getCoin(finalRank);
 
                                     Coin finalCoin = coin;
@@ -139,10 +139,9 @@ public class CurrencyListActivity extends AppCompatActivity {
                                 }
                                 if (isConnectedToInternet()) {
                                     coin = getCoin(finalRank);
-                                    System.out.println("HELLLLLLLLLLLLLLLLLO");
-//                                    if (dataBaseHandler.coinExists(coin))
-//                                        dataBaseHandler.updateCoin(coin);
-//                                    else
+                                    if (dataBaseHandler.coinExists(finalRank))
+                                        dataBaseHandler.updateContact(coin);
+                                    else
                                     dataBaseHandler.addCoin(coin);
 
                                     Coin finalCoin1 = coin;
@@ -160,8 +159,6 @@ public class CurrencyListActivity extends AppCompatActivity {
                 case openOhlcPage: {
                     if (!buttonClicked.get()) {
                         buttonClicked.set(true);
-
-                        runOnUiThread(() -> findViewById(id.noConnectionImg).setVisibility(isConnectedToInternet() ? INVISIBLE : VISIBLE));
 
                         Coin coin = (Coin) msg.obj;
                         executer.execute(() -> {
@@ -194,6 +191,10 @@ public class CurrencyListActivity extends AppCompatActivity {
             }
             return true;
         });
+    }
+
+    private boolean shouldShowNoInternetPic() {
+        return !isConnectedToInternet() && dataBaseHandler.getCoinCount()==0;
     }
 
     @RequiresApi(api = N)

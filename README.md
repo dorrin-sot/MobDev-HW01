@@ -4,4 +4,4 @@
 ###### Peyman Haji Mohammad 98170776
 ###### Yasin moosavi 98110351
 
-* Project is about doing the cash 
+* project is about doing the cash 

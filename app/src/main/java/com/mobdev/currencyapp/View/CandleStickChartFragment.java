@@ -22,6 +22,7 @@ import com.mobdev.currencyapp.R;
 
 import org.threeten.bp.LocalDate;
 
+//import java.time.LocalDate;
 import java.util.ArrayList;
 
 import static android.graphics.Color.WHITE;
@@ -32,6 +33,7 @@ import static com.github.mikephil.charting.components.YAxis.AxisDependency.LEFT;
 import static java.lang.String.valueOf;
 import static org.threeten.bp.LocalDate.now;
 import static org.threeten.bp.format.DateTimeFormatter.ofPattern;
+
 
 /**
  * A simple {@link Fragment} subclass.

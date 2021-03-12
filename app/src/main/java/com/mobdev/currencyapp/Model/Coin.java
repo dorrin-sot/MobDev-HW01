@@ -174,7 +174,7 @@ public class Coin {
 //            ));
 //        }
         try {
-            JSONArray jsonArray = getFromCoinIo(this.symbol,OHLCtilte,OHLCKey,numOfDays);
+            JSONArray jsonArray = getFromCoinIo(this.symbol,OHLCtilte,OHLCKey,numOfDays+1);
             for (int i = 1; i <= jsonArray.length(); i++) {
                 JSONObject candle = jsonArray.getJSONObject(i);
                 float high = Float.parseFloat(candle.getString("price_high"));

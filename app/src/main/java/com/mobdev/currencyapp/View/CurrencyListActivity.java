@@ -25,8 +25,6 @@ import com.github.mikephil.charting.data.CandleEntry;
 import com.mobdev.currencyapp.Controller.DatabaseHandler;
 import com.mobdev.currencyapp.Model.Coin;
 
-import org.threeten.bp.LocalDate;
-
 import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -45,6 +43,7 @@ import static com.mobdev.currencyapp.R.id;
 import static com.mobdev.currencyapp.R.layout;
 import static com.mobdev.currencyapp.View.MyCoinListRecyclerViewAdapter.getCoins;
 import static com.mobdev.currencyapp.View.OhlcDialogFragment.newInstance;
+import static java.lang.Math.toIntExact;
 import static org.threeten.bp.LocalDate.now;
 
 public class CurrencyListActivity extends AppCompatActivity {
@@ -172,12 +171,10 @@ public class CurrencyListActivity extends AppCompatActivity {
 
                         Coin coin = (Coin) msg.obj;
                         executer.execute(() -> {
-                            LocalDate date = now().minusDays(7)
-                                    .minusDays(1); // to exclude today
-                            ArrayList<CandleEntry> ohlcData1Week = coin.generateRandomOHLCData(date, now().minusDays(1));
-                            date = now().minusMonths(1)
-                                    .minusDays(1); // to exclude today
-                            ArrayList<CandleEntry> ohlcData1Month = coin.generateRandomOHLCData(date, now().minusDays(1));
+                            ArrayList<CandleEntry> ohlcData1Week = coin.generateRandomOHLCData(7),
+                                    ohlcData1Month = coin.generateRandomOHLCData(
+                                            toIntExact(now().toEpochDay() - now().minusMonths(1).toEpochDay()) // is number of days in last month
+                                    );
 
                             runOnUiThread(() -> {
                                 FragmentTransaction ft = getFragmentManager().beginTransaction();

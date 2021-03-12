@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.threeten.bp.LocalDate;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,8 +20,6 @@ import okhttp3.Response;
 
 import static android.os.Build.VERSION_CODES.O;
 import static com.mobdev.currencyapp.View.CurrencyListActivity.dataBaseHandler;
-import static java.lang.Math.random;
-import static java.lang.Math.toIntExact;
 import static java.lang.String.valueOf;
 
 public class Coin {
@@ -149,7 +146,7 @@ public class Coin {
 
     // todo only for testing
     @RequiresApi(api = O)
-    public synchronized ArrayList<CandleEntry> generateRandomOHLCData(LocalDate start, LocalDate end) {
+    public synchronized ArrayList<CandleEntry> generateRandomOHLCData(int numOfDays) {
         //todo add limit to methode inputs
         int myLimit =7;
 
@@ -163,8 +160,7 @@ public class Coin {
                 float open = Float.parseFloat(candle.getString("price_open"));
                 float close = Float.parseFloat(candle.getString("price_close"));
                 //todo for dorin : check if args are correct
-                values.add(new CandleEntry(toIntExact(start.toEpochDay()) - i,high,low,open,close));
-
+                values.add(new CandleEntry(i,high,low,open,close));
             }
 
         } catch (JSONException e) {

@@ -25,7 +25,8 @@ import com.github.mikephil.charting.data.CandleEntry;
 import com.mobdev.currencyapp.Controller.DatabaseHandler;
 import com.mobdev.currencyapp.Model.Coin;
 
-import java.time.LocalDate;
+import org.threeten.bp.LocalDate;
+
 import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -44,7 +45,7 @@ import static com.mobdev.currencyapp.R.id;
 import static com.mobdev.currencyapp.R.layout;
 import static com.mobdev.currencyapp.View.MyCoinListRecyclerViewAdapter.getCoins;
 import static com.mobdev.currencyapp.View.OhlcDialogFragment.newInstance;
-import static java.time.LocalDate.now;
+import static org.threeten.bp.LocalDate.now;
 
 public class CurrencyListActivity extends AppCompatActivity {
     static Handler handler = new Handler();
@@ -94,7 +95,7 @@ public class CurrencyListActivity extends AppCompatActivity {
         Message message = new Message();
         message.what = loadCoins;
         message.arg1 = getCoins().size() + 1; // start
-        message.arg2 = 10; // number of coins to load
+        message.arg2 = 5; // number of coins to load
         handler.sendMessage(message);
     }
 

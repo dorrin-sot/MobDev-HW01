@@ -20,7 +20,8 @@ import com.github.mikephil.charting.data.CandleEntry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.mobdev.currencyapp.R;
 
-import java.time.LocalDate;
+import org.threeten.bp.LocalDate;
+
 import java.util.ArrayList;
 
 import static android.graphics.Color.WHITE;
@@ -29,8 +30,8 @@ import static androidx.core.content.ContextCompat.getColor;
 import static com.github.mikephil.charting.components.XAxis.XAxisPosition.BOTH_SIDED;
 import static com.github.mikephil.charting.components.YAxis.AxisDependency.LEFT;
 import static java.lang.String.valueOf;
-import static java.time.LocalDate.now;
-import static java.time.format.DateTimeFormatter.ofPattern;
+import static org.threeten.bp.LocalDate.now;
+import static org.threeten.bp.format.DateTimeFormatter.ofPattern;
 
 /**
  * A simple {@link Fragment} subclass.

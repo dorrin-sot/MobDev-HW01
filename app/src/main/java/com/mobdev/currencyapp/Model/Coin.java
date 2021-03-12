@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi;
 import com.github.mikephil.charting.data.CandleEntry;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.threeten.bp.LocalDate;
@@ -149,30 +150,78 @@ public class Coin {
     // todo only for testing
     @RequiresApi(api = O)
     public synchronized ArrayList<CandleEntry> generateRandomOHLCData(LocalDate start, LocalDate end) {
+        //todo add limit to methode inputs
+        int myLimit =7;
 
         ArrayList<CandleEntry> values = new ArrayList<>();
+        try {
+            JSONArray jsonArray = new JSONArray(getFromCoinIo(this.symbol,OHLCtilte,OHLCKey,myLimit));
+            for (int i = 1; i < jsonArray.length(); i++) {
+                JSONObject candle = jsonArray.getJSONObject(i);
+                float high = Float.parseFloat(candle.getString("price_high"));
+                float low = Float.parseFloat(candle.getString("price_low"));
+                float open = Float.parseFloat(candle.getString("price_open"));
+                float close = Float.parseFloat(candle.getString("price_close"));
+                //todo for dorin : check if args are correct
+                values.add(new CandleEntry(toIntExact(start.toEpochDay()) - i,high,low,open,close));
 
-        for (int i = toIntExact(end.toEpochDay()); i >= toIntExact(start.toEpochDay()); i--) {
-            float multi = (100 + 1);
-            float val = (float) (random() * 40) + multi;
+            }
 
-            float high = (float) (random() * 9) + 8f;
-            float low = (float) (random() * 9) + 8f;
-
-            float open = (float) (random() * 6) + 1f;
-            float close = (float) (random() * 6) + 1f;
-
-            boolean even = i % 2 == 0;
-
-            values.add(new CandleEntry(
-                    toIntExact(start.toEpochDay()) - i,
-                    val + high,
-                    val - low,
-                    even ? val + open : val - open,
-                    even ? val - close : val + close
-            ));
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+        /*
+        sample response from server:
+         */
+// [
+//        {
+//            "time_period_start": "2017-08-09T14:31:00.0000000Z",
+//                "time_period_end": "2017-08-09T14:32:00.0000000Z",
+//                "time_open": "2017-08-09T14:31:01.0000000Z",
+//                "time_close": "2017-08-09T14:31:46.0000000Z",
+//                "price_open": 3255.590000000,
+//                "price_high": 3255.590000000,
+//                "price_low": 3244.740000000,
+//                "price_close": 3244.740000000,
+//                "volume_traded": 16.903274550,
+//                "trades_count": 31
+//        },
+//        {
+//            "time_period_start": "2017-08-09T14:30:00.0000000Z",
+//                "time_period_end": "2017-08-09T14:31:00.0000000Z",
+//                "time_open": "2017-08-09T14:30:05.0000000Z",
+//                "time_close": "2017-08-09T14:30:35.0000000Z",
+//                "price_open": 3256.000000000,
+//                "price_high": 3256.010000000,
+//                "price_low": 3247.000000000,
+//                "price_close": 3255.600000000,
+//                "volume_traded": 58.131397920,
+//                "trades_count": 33
+//        }
+//]
+
+
         return values;
+    }
+    private JSONArray getFromCoinIo(String symbol, String title, String key, int limit){
+        OkHttpClient client = new OkHttpClient();
+        String rawUrl =String.format("https://rest.coinapi.io/v1/ohlcv/%s/USD/latest?period_id=1DAY",symbol);
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(rawUrl).newBuilder();
+        urlBuilder.addQueryParameter("limit",""+limit+"");
+        String url = urlBuilder.build().toString();
+        Request request = new Request.Builder()
+                .header(title, key)
+                .url(url)
+                .build();
+        try {
+            Response response = client.newCall(request).execute();
+            String str =response.body().string();
+            System.out.println(str);
+            return new JSONArray(str);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private static JSONObject GetJSON(String rawURL, int id, String title, String key) {
@@ -186,7 +235,9 @@ public class Coin {
                 .build();
         try {
             Response response = client.newCall(request).execute();
-            JSONObject data = new JSONObject(response.body().string()).getJSONObject("data").getJSONObject("" + id + "");
+            String str = response.body().string();
+            System.out.println(str);
+            JSONObject data = new JSONObject(str).getJSONObject("data").getJSONObject("" + id + "");
 //            int errorCode = new JSONObject(response.body().string()).getJSONObject("status").getInt("error_code");
 //            if (errorCode != 0)
 //                System.out.println("errorCode = " + errorCode);
@@ -197,6 +248,27 @@ public class Coin {
         return null;
     }
 
+
+    //        for (int i = toIntExact(end.toEpochDay()); i >= toIntExact(start.toEpochDay()); i--) {
+//            float multi = (100 + 1);
+//            float val = (float) (random() * 40) + multi;
+//
+//            float high = (float) (random() * 9) + 8f;
+//            float low = (float) (random() * 9) + 8f;
+//
+//            float open = (float) (random() * 6) + 1f;
+//            float close = (float) (random() * 6) + 1f;
+//
+//            boolean even = i % 2 == 0;
+//
+//            values.add(new CandleEntry(
+//                    toIntExact(start.toEpochDay()) - i,
+//                    val + high,
+//                    val - low,
+//                    even ? val + open : val - open,
+//                    even ? val - close : val + close
+//            ));
+//        }
     public String getName() {
         return name;
     }

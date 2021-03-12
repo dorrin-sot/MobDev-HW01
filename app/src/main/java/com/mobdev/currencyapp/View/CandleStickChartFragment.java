@@ -94,6 +94,7 @@ public class CandleStickChartFragment extends Fragment {
         xAxis.setAvoidFirstLastClipping(true);
         xAxis.setTextSize(width / 125f);
         xAxis.setDrawLabels(true);
+        xAxis.setLabelCount(ohlcData.size()/2, false);
         xAxis.setValueFormatter(new IndexAxisValueFormatter() {
             @Override
             public String getFormattedValue(float value) {

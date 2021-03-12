@@ -48,7 +48,7 @@ import static org.threeten.bp.LocalDate.now;
 
 public class CurrencyListActivity extends AppCompatActivity {
     static Handler handler = new Handler();
-    public static final int loadCoins = 1, openOhlcPage = 2;
+    public static final int loadCoins = 1, openOhlcPage = 2, proceedProgressBar = 3;
     public static DatabaseHandler dataBaseHandler;
     static ThreadPoolExecutor executer;
 
@@ -75,7 +75,7 @@ public class CurrencyListActivity extends AppCompatActivity {
 
         System.out.println("isConnectedToInternet() = " + isConnectedToInternet());
 
-        executer = (ThreadPoolExecutor) Executors.newFixedThreadPool(5);
+        executer = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
 
         recyclerView = findViewById(id.coinRecyclerView);
         recyclerView.setAdapter(new MyCoinListRecyclerViewAdapter());
@@ -170,11 +170,18 @@ public class CurrencyListActivity extends AppCompatActivity {
                         buttonClicked.set(true);
 
                         Coin coin = (Coin) msg.obj;
+                        int numberOfOhlcDataToLoad = 7 + toIntExact(now().toEpochDay() - now().minusMonths(1).toEpochDay());
+                        runOnUiThread(() -> {
+                            ProgressBar progressBar = findViewById(id.loadingProgressBar);
+                            progressBar.setProgress(0, true);
+                            progressBar.setMax(numberOfOhlcDataToLoad);
+                            progressBar.setVisibility(VISIBLE);
+                            findViewById(id.noConnectionImg).setVisibility(shouldShowNoInternetPic() ? VISIBLE : INVISIBLE);
+                        });
                         executer.execute(() -> {
-                            ArrayList<CandleEntry> ohlcData1Week = coin.generateRandomOHLCData(7),
-                                    ohlcData1Month = coin.generateRandomOHLCData(
-                                            toIntExact(now().toEpochDay() - now().minusMonths(1).toEpochDay()) // is number of days in last month
-                                    );
+                            ArrayList<CandleEntry> ohlcData1Month = coin.generateRandomOHLCData(
+                                    numberOfOhlcDataToLoad - 7 // is number of days in last month
+                            ),ohlcData1Week = coin.generateRandomOHLCData(7);
 
                             runOnUiThread(() -> {
                                 FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -192,6 +199,10 @@ public class CurrencyListActivity extends AppCompatActivity {
 //                    setAllButtonEnabled(true);
                         });
                     }
+                }
+                break;
+                case proceedProgressBar: {
+                    addProgress();
                 }
                 break;
                 default:
@@ -221,14 +232,12 @@ public class CurrencyListActivity extends AppCompatActivity {
     @RequiresApi(api = N)
     synchronized void addProgress() {
         ProgressBar progressBar = findViewById(id.loadingProgressBar);
-//        System.out.println(progressBar.getProgress() + ", " + progressBar.getMax());
 
         progressBar.setProgress(progressBar.getProgress() + 1, true);
 
         if (progressBar.getProgress() == progressBar.getMax() - 1) {
             progressBar.setVisibility(INVISIBLE);
             progressBar.setProgress(0, false);
-//            System.out.println(progressBar.getProgress() + ", " + progressBar.getMax());
         }
     }
 
@@ -260,6 +269,10 @@ public class CurrencyListActivity extends AppCompatActivity {
 
     public static Handler getHandler() {
         return handler;
+    }
+
+    public static int getProceedProgressBar() {
+        return proceedProgressBar;
     }
 
     public static ThreadPoolExecutor getExecuter() {

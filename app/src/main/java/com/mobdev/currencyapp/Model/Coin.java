@@ -1,5 +1,7 @@
 package com.mobdev.currencyapp.Model;
 
+import android.os.Message;
+
 import androidx.annotation.RequiresApi;
 
 import com.github.mikephil.charting.data.CandleEntry;
@@ -20,8 +22,8 @@ import okhttp3.Response;
 
 import static android.os.Build.VERSION_CODES.O;
 import static com.mobdev.currencyapp.View.CurrencyListActivity.dataBaseHandler;
-import static java.lang.Math.random;
-import static java.lang.Math.toIntExact;
+import static com.mobdev.currencyapp.View.CurrencyListActivity.getHandler;
+import static com.mobdev.currencyapp.View.CurrencyListActivity.getProceedProgressBar;
 import static java.lang.String.valueOf;
 
 public class Coin {
@@ -174,15 +176,21 @@ public class Coin {
 //            ));
 //        }
         try {
-            JSONArray jsonArray = getFromCoinIo(this.symbol,OHLCtilte,OHLCKey,numOfDays+1);
+            JSONArray jsonArray = getFromCoinIo(this.symbol, OHLCtilte, OHLCKey, numOfDays + 1);
             for (int i = 1; i <= jsonArray.length(); i++) {
                 JSONObject candle = jsonArray.getJSONObject(i);
+
+                // to proceed progress bar
+                Message message = new Message();
+                message.what = getProceedProgressBar();
+                getHandler().sendMessage(message);
+
                 float high = Float.parseFloat(candle.getString("price_high"));
                 float low = Float.parseFloat(candle.getString("price_low"));
                 float open = Float.parseFloat(candle.getString("price_open"));
                 float close = Float.parseFloat(candle.getString("price_close"));
                 //todo for dorin : check if args are correct
-                values.add(new CandleEntry(i-1,high,low,open,close));
+                values.add(new CandleEntry(i - 1, high, low, open, close));
             }
 
         } catch (JSONException e) {
@@ -221,11 +229,12 @@ public class Coin {
 
         return values;
     }
-    private JSONArray getFromCoinIo(String symbol, String title, String key, int limit){
+
+    private JSONArray getFromCoinIo(String symbol, String title, String key, int limit) {
         OkHttpClient client = new OkHttpClient();
-        String rawUrl =String.format("https://rest.coinapi.io/v1/ohlcv/%s/USD/latest?period_id=1DAY",symbol);
+        String rawUrl = String.format("https://rest.coinapi.io/v1/ohlcv/%s/USD/latest?period_id=1DAY", symbol);
         HttpUrl.Builder urlBuilder = HttpUrl.parse(rawUrl).newBuilder();
-        urlBuilder.addQueryParameter("limit",""+limit+"");
+        urlBuilder.addQueryParameter("limit", "" + limit + "");
         String url = urlBuilder.build().toString();
         Request request = new Request.Builder()
                 .header(title, key)
@@ -233,10 +242,10 @@ public class Coin {
                 .build();
         try {
             Response response = client.newCall(request).execute();
-            String str =response.body().string();
+            String str = response.body().string();
             System.out.println(str);
             return new JSONArray(str);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;

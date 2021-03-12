@@ -155,26 +155,6 @@ public class Coin {
 //        int myLimit =7;
 
         ArrayList<CandleEntry> values = new ArrayList<>();
-//        for (int i = toIntExact(end.toEpochDay()); i >= toIntExact(start.toEpochDay()); i--) {
-//            float multi = (100 + 1);
-//            float val = (float) (random() * 40) + multi;
-//
-//            float high = (float) (random() * 9) + 8f;
-//            float low = (float) (random() * 9) + 8f;
-//
-//            float open = (float) (random() * 6) + 1f;
-//            float close = (float) (random() * 6) + 1f;
-//
-//            boolean even = i % 2 == 0;
-//
-//            values.add(new CandleEntry(
-//                    toIntExact(start.toEpochDay()) - i,
-//                    val + high,
-//                    val - low,
-//                    even ? val + open : val - open,
-//                    even ? val - close : val + close
-//            ));
-//        }
         try {
             JSONArray jsonArray = getFromCoinIo(this.symbol, OHLCtilte, OHLCKey, numOfDays + 1);
             for (int i = 1; i <= jsonArray.length(); i++) {
@@ -196,37 +176,6 @@ public class Coin {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        /*
-        sample response from server:
-         */
-// [
-//        {
-//            "time_period_start": "2017-08-09T14:31:00.0000000Z",
-//                "time_period_end": "2017-08-09T14:32:00.0000000Z",
-//                "time_open": "2017-08-09T14:31:01.0000000Z",
-//                "time_close": "2017-08-09T14:31:46.0000000Z",
-//                "price_open": 3255.590000000,
-//                "price_high": 3255.590000000,
-//                "price_low": 3244.740000000,
-//                "price_close": 3244.740000000,
-//                "volume_traded": 16.903274550,
-//                "trades_count": 31
-//        },
-//        {
-//            "time_period_start": "2017-08-09T14:30:00.0000000Z",
-//                "time_period_end": "2017-08-09T14:31:00.0000000Z",
-//                "time_open": "2017-08-09T14:30:05.0000000Z",
-//                "time_close": "2017-08-09T14:30:35.0000000Z",
-//                "price_open": 3256.000000000,
-//                "price_high": 3256.010000000,
-//                "price_low": 3247.000000000,
-//                "price_close": 3255.600000000,
-//                "volume_traded": 58.131397920,
-//                "trades_count": 33
-//        }
-//]
-
-
         return values;
     }
 
@@ -275,27 +224,6 @@ public class Coin {
         return null;
     }
 
-
-    //        for (int i = toIntExact(end.toEpochDay()); i >= toIntExact(start.toEpochDay()); i--) {
-//            float multi = (100 + 1);
-//            float val = (float) (random() * 40) + multi;
-//
-//            float high = (float) (random() * 9) + 8f;
-//            float low = (float) (random() * 9) + 8f;
-//
-//            float open = (float) (random() * 6) + 1f;
-//            float close = (float) (random() * 6) + 1f;
-//
-//            boolean even = i % 2 == 0;
-//
-//            values.add(new CandleEntry(
-//                    toIntExact(start.toEpochDay()) - i,
-//                    val + high,
-//                    val - low,
-//                    even ? val + open : val - open,
-//                    even ? val - close : val + close
-//            ));
-//        }
     public String getName() {
         return name;
     }

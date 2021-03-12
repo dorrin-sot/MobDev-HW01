@@ -1,7 +1,6 @@
 package com.mobdev.currencyapp.View;
 
 import android.app.Activity;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -22,17 +21,18 @@ import com.mobdev.currencyapp.R;
 
 import org.threeten.bp.LocalDate;
 
-//import java.time.LocalDate;
 import java.util.ArrayList;
 
 import static android.graphics.Color.WHITE;
 import static android.graphics.Paint.Style.FILL;
+import static android.os.Build.VERSION_CODES.O;
 import static androidx.core.content.ContextCompat.getColor;
-import static com.github.mikephil.charting.components.XAxis.XAxisPosition.BOTH_SIDED;
+import static com.github.mikephil.charting.components.XAxis.XAxisPosition.BOTTOM;
 import static com.github.mikephil.charting.components.YAxis.AxisDependency.LEFT;
-import static java.lang.String.valueOf;
 import static org.threeten.bp.LocalDate.now;
 import static org.threeten.bp.format.DateTimeFormatter.ofPattern;
+
+//import java.time.LocalDate;
 
 
 /**
@@ -65,7 +65,7 @@ public class CandleStickChartFragment extends Fragment {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    @RequiresApi(api = O)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -88,21 +88,24 @@ public class CandleStickChartFragment extends Fragment {
         chart.setDrawGridBackground(false);
 
         XAxis xAxis = chart.getXAxis();
-        xAxis.setPosition(BOTH_SIDED);
+        xAxis.setPosition(BOTTOM);
         xAxis.setDrawAxisLine(true);
         xAxis.setDrawGridLinesBehindData(true);
         xAxis.setAvoidFirstLastClipping(true);
-        System.out.println(width);
         xAxis.setTextSize(width / 125f);
         xAxis.setDrawLabels(true);
         xAxis.setValueFormatter(new IndexAxisValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
                 LocalDate date = now().minusDays((long) value).minusDays(1);
-                return valueOf(ofPattern("MM/dd").format(date));
+                String pattern;
+                if (date.getDayOfMonth()==1)
+                    pattern = "MMM";
+                else
+                    pattern = "d";
+                return ofPattern(pattern).format(date);
             }
         });
-        xAxis.setLabelRotationAngle(-30);
 
         YAxis yAxis = chart.getAxisLeft();
         yAxis.setDrawAxisLine(true);

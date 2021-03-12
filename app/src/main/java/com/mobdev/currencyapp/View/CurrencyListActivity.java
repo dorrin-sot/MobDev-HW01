@@ -133,10 +133,10 @@ public class CurrencyListActivity extends AppCompatActivity {
                                  */
                                 if (isConnectedToInternet()) {
                                     coin = getCoin(finalRank);
-//                                    if (dataBaseHandler.coinExists(finalRank))
-//                                        dataBaseHandler.updateContact(coin);
-//                                    else
-//                                        dataBaseHandler.addCoin(coin);
+                                    if (dataBaseHandler.coinExists(finalRank))
+                                        dataBaseHandler.updateContact(coin);
+                                    else
+                                        dataBaseHandler.addCoin(coin);
 
                                     Coin finalCoin = coin;
                                     runOnUiThread(() -> {

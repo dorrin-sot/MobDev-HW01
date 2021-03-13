@@ -21,7 +21,6 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 import static android.os.Build.VERSION_CODES.O;
-import static com.mobdev.currencyapp.View.CurrencyListActivity.dataBaseHandler;
 import static com.mobdev.currencyapp.View.CurrencyListActivity.getHandler;
 import static com.mobdev.currencyapp.View.CurrencyListActivity.getProceedProgressBar;
 import static java.lang.String.valueOf;
@@ -65,11 +64,8 @@ public class Coin {
 
     public static Coin getCoin(int id) {
         Coin coin = constructCoin(id);
+        if (coin == null) return null;
         coinList.addLast(coin);
-        if (dataBaseHandler.coinExists(id))
-            dataBaseHandler.updateContact(coin);
-        else
-            dataBaseHandler.addCoin(coin);
         return coin;
     }
 
@@ -121,6 +117,7 @@ public class Coin {
 
 
         JSONObject data = GetJSON(marketCapAPI, id, apiTtlte, apiKey);
+        if (data == null) return null;
         System.out.println("data=" + data);
         try {
             name[0] = data.getString("name");
@@ -213,7 +210,10 @@ public class Coin {
             Response response = client.newCall(request).execute();
             String str = response.body().string();
             System.out.println(str);
-            JSONObject data = new JSONObject(str).getJSONObject("data").getJSONObject("" + id + "");
+            JSONObject data = new JSONObject(str);
+            if (data.getJSONObject("status").getInt("error_code") == 400)
+                return null;
+            data = data.getJSONObject("data").getJSONObject("" + id + "");
 //            int errorCode = new JSONObject(response.body().string()).getJSONObject("status").getInt("error_code");
 //            if (errorCode != 0)
 //                System.out.println("errorCode = " + errorCode);

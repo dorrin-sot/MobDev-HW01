@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView.LayoutParams;
 
 import com.bumptech.glide.Glide;
 import com.mobdev.currencyapp.Model.Coin;
@@ -20,6 +21,7 @@ import java.util.HashMap;
 import static android.os.Build.VERSION_CODES.M;
 import static android.os.Build.VERSION_CODES.N;
 import static android.view.LayoutInflater.from;
+import static android.view.View.GONE;
 import static androidx.core.content.ContextCompat.getColor;
 import static com.mobdev.currencyapp.Model.Coin.clearCoinList;
 import static com.mobdev.currencyapp.R.color;
@@ -67,7 +69,11 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
         if (coins.isEmpty()) return;
         position++;
         Coin coin = coins.get(position);
-        if (coin == null) return;
+        if (coin == null) {
+            holder.itemView.setVisibility(GONE);
+            holder.itemView.setLayoutParams(new LayoutParams(0, 0));
+            return;
+        }
         holder.coin = coin;
 //        holder.coinRank.setText(valueOf(coin.getRank()));
         setCoinIcon(coin, holder.coinIcon);
@@ -150,10 +156,10 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
     }
 
     @RequiresApi(api = N)
-    public synchronized void addCoinObj(Coin coin) {
+    public synchronized void addCoinObj(int position, Coin coin) {
         coins.remove(0);
-        coins.put(coin.getId(), coin);
-        notifyItemChanged(coin.getId() - 1);
+        coins.put(position, coin);
+        notifyItemChanged(position - 1);
     }
 
     public static synchronized HashMap<Integer, Coin> getCoins() {

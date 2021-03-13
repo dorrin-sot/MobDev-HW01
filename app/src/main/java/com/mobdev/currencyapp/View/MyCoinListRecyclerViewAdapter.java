@@ -65,7 +65,7 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         if (coins.isEmpty()) return;
-        position++;
+//        position--;
         Coin coin = coins.get(position);
         if (coin == null) return;
         holder.coin = coin;
@@ -152,8 +152,11 @@ public class MyCoinListRecyclerViewAdapter extends RecyclerView.Adapter<MyCoinLi
     @RequiresApi(api = N)
     public synchronized void addCoinObj(Coin coin) {
         coins.remove(0);
-        coins.put(coin.getId(), coin);
-        notifyItemChanged(coin.getId() - 1);
+//        coins.put(coin.getRank()-1, coin);
+//        System.out.println(coin.getRank() + "  " + coin.getId());
+//        notifyItemChanged(coin.getRank()-1);
+        coins.put(coin.getRank() - 1, coin);
+        notifyItemChanged(coin.getRank() - 1);
     }
 
     public static synchronized HashMap<Integer, Coin> getCoins() {

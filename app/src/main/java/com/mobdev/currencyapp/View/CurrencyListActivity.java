@@ -10,7 +10,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -20,16 +19,26 @@ import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.github.mikephil.charting.data.CandleEntry;
-import com.mobdev.currencyapp.Controller.DatabaseHandler;
 import com.mobdev.currencyapp.Model.Coin;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Request.Builder;
+import okhttp3.Response;
 
 import static android.os.Build.VERSION_CODES.N;
 import static android.os.Build.VERSION_CODES.O;
@@ -37,8 +46,8 @@ import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 import static android.widget.Toast.LENGTH_LONG;
 import static androidx.recyclerview.widget.DividerItemDecoration.VERTICAL;
+import static com.mobdev.currencyapp.Controller.DatabaseHandler.getInstance;
 import static com.mobdev.currencyapp.Model.Coin.getCoin;
-import static com.mobdev.currencyapp.R.drawable;
 import static com.mobdev.currencyapp.R.id;
 import static com.mobdev.currencyapp.R.layout;
 import static com.mobdev.currencyapp.View.MyCoinListRecyclerViewAdapter.getCoins;
@@ -49,8 +58,9 @@ import static org.threeten.bp.LocalDate.now;
 public class CurrencyListActivity extends AppCompatActivity {
     static Handler handler = new Handler();
     public static final int loadCoins = 1, openOhlcPage = 2, proceedProgressBar = 3;
-    public static DatabaseHandler dataBaseHandler;
     static ThreadPoolExecutor executer;
+
+    public static LinkedList<Integer> availableIDs = new LinkedList<>();
 
     RecyclerView recyclerView;
     MyCoinListRecyclerViewAdapter adapter;
@@ -62,20 +72,21 @@ public class CurrencyListActivity extends AppCompatActivity {
         findViewById(id.loadNext10Btn).setOnClickListener(v -> loadNext10());
         findViewById(id.refreshBtn).setOnClickListener(v -> refreshAndStartOver());
 
-        dataBaseHandler = DatabaseHandler.getInstance(this);
-
-        ImageView noConnectionImgView = (ImageView) findViewById(id.noConnectionImg);
-        Glide.with(this)
-                .load("https://image.freepik.com/free-vector/no-internet-connection-sign_79145-136.jpg")
-                .centerCrop()
-                .override(1500)
-                .placeholder(drawable.no_connection)
-                .into(noConnectionImgView);
-        noConnectionImgView.setVisibility(shouldShowNoInternetPic() ? VISIBLE : INVISIBLE);
+//        ImageView noConnectionImgView = (ImageView) findViewById(id.noConnectionImg);
+//        Glide.with(this)
+//                .load("https://image.freepik.com/free-vector/no-internet-connection-sign_79145-136.jpg")
+//                .thumbnail()
+//                .centerCrop()
+//                .override(1500)
+//                .placeholder(drawable.no_connection)
+//                .into(noConnectionImgView);
+//        noConnectionImgView.setVisibility(shouldShowNoInternetPic() ? VISIBLE : INVISIBLE);
+        if (shouldShowNoInternetPic())
+            showCantConnectToInternetToast();
 
         System.out.println("isConnectedToInternet() = " + isConnectedToInternet());
 
-        executer = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
+        executer = (ThreadPoolExecutor) Executors.newFixedThreadPool(5);
 
         recyclerView = findViewById(id.coinRecyclerView);
         recyclerView.setAdapter(new MyCoinListRecyclerViewAdapter());
@@ -94,14 +105,50 @@ public class CurrencyListActivity extends AppCompatActivity {
         Message message = new Message();
         message.what = loadCoins;
         message.arg1 = getCoins().size() + 1; // start
-        message.arg2 = 5; // number of coins to load
+        message.arg2 = 10; // number of coins to load
         handler.sendMessage(message);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        getInstance(this).getReadableDatabase().close();
+        getInstance(this).getWritableDatabase().close();
     }
 
     @RequiresApi(api = O)
     @Override
     protected void onStart() {
         super.onStart();
+
+        executer.execute(() -> {
+            if (isConnectedToInternet())
+                try {
+                    OkHttpClient coinClient = new OkHttpClient();
+                    HttpUrl.Builder urlBuilder = HttpUrl.parse("https://pro-api.coinmarketcap.com/v1/cryptocurrency/map").newBuilder();
+                    urlBuilder.addQueryParameter("sort", "id");
+                    Request request = new Builder()
+                            .addHeader("X-CMC_PRO_API_KEY", "a7f4c18e-942e-4ace-971b-10c34e92806d")
+                            .addHeader("Accept", "application/json")
+                            .url(urlBuilder.build().toString())
+                            .build();
+                    Response coinResponse = coinClient.newCall(request).execute();
+                    JSONArray idsFromApi = new JSONObject(coinResponse.body().string()).getJSONArray("data");
+                    for (int i = 0; i < idsFromApi.length(); i++) {
+                        availableIDs.addLast(idsFromApi.getJSONObject(i).getInt("id"));
+                    }
+                } catch (JSONException | IOException e) {
+                    e.printStackTrace();
+                }
+            else
+                availableIDs = getInstance(this).getAvailableIDs();
+            availableIDs.forEach(id -> System.out.print(id + "  "));
+            System.out.println();
+            runOnUiThread(() -> {
+                findViewById(id.refreshBtn).setEnabled(true);
+                findViewById(id.loadNext10Btn).setEnabled(true);
+            });
+        });
 
         AtomicBoolean loadFromCache = new AtomicBoolean(false), buttonClicked = new AtomicBoolean(false);
         AtomicInteger numberOfDialogsOpened = new AtomicInteger();
@@ -112,6 +159,11 @@ public class CurrencyListActivity extends AppCompatActivity {
 //                    setAllButtonEnabled(false);
                     if (!buttonClicked.get()) {
                         buttonClicked.set(true);
+                        if (shouldShowNoInternetPic()) {
+                            showCantConnectToInternetToast();
+                            buttonClicked.set(false);
+                            break;
+                        }
 
                         int start = msg.arg1, num = msg.arg2, end = start + num;
                         runOnUiThread(() -> {
@@ -119,11 +171,21 @@ public class CurrencyListActivity extends AppCompatActivity {
                             progressBar.setProgress(0, true);
                             progressBar.setMax(num);
                             progressBar.setVisibility(VISIBLE);
-                            findViewById(id.noConnectionImg).setVisibility(shouldShowNoInternetPic() ? VISIBLE : INVISIBLE);
+//                            findViewById(id.noConnectionImg).setVisibility(shouldShowNoInternetPic() ? VISIBLE : INVISIBLE);
                         });
+
                         loadFromCache.set(canLoadFromCache());
                         for (int rank = start; rank < end; rank++) {
                             int finalRank = rank;
+                            if (rank - 1 >= availableIDs.size()) {
+                                runOnUiThread(() -> {
+                                    for (int i = finalRank; i < end; i++)
+                                        addProgress();
+                                    Toast.makeText(this, "No more data in cache", LENGTH_LONG).show();
+                                });
+                                break;
+                            }
+                            int id = availableIDs.get(rank - 1);
                             executer.execute(() -> {
                                 Coin coin;
                                 /*
@@ -132,11 +194,11 @@ public class CurrencyListActivity extends AppCompatActivity {
                                 if "y" internet                 get from api
                                  */
                                 if (isConnectedToInternet()) {
-                                    coin = getCoin(finalRank);
-                                    if (dataBaseHandler.coinExists(finalRank))
-                                        dataBaseHandler.updateContact(coin);
+                                    coin = getCoin(id, finalRank);
+                                    if (getInstance(this).coinExists(id))
+                                        getInstance(this).updateContact(coin);
                                     else
-                                        dataBaseHandler.addCoin(coin);
+                                        getInstance(this).addCoin(coin);
 
                                     Coin finalCoin = coin;
                                     runOnUiThread(() -> {
@@ -144,8 +206,8 @@ public class CurrencyListActivity extends AppCompatActivity {
                                         addProgress();
                                     });
                                 } else {
-                                    if (dataBaseHandler.coinExists(finalRank)) {
-                                        coin = dataBaseHandler.getCoin(finalRank);
+                                    if (getInstance(this).coinExists(id)) {
+                                        coin = getInstance(this).getCoin(id, finalRank);
                                         Coin finalCoin = coin;
                                         System.out.println(coin.getName());
                                         runOnUiThread(() -> {
@@ -153,9 +215,7 @@ public class CurrencyListActivity extends AppCompatActivity {
                                             addProgress();
                                         });
                                     } else
-                                        runOnUiThread(() ->
-                                                Toast.makeText(this, "Cannot Connect To The Internet", LENGTH_LONG).show()
-                                        );
+                                        runOnUiThread(this::showCantConnectToInternetToast);
                                 }
                                 buttonClicked.set(false);
 //                    setAllButtonEnabled(true);
@@ -168,6 +228,11 @@ public class CurrencyListActivity extends AppCompatActivity {
 //                    setAllButtonEnabled(false);
                     if (!buttonClicked.get()) {
                         buttonClicked.set(true);
+                        if (shouldShowNoInternetPic()) {
+                            showCantConnectToInternetToast();
+                            buttonClicked.set(false);
+                            break;
+                        }
 
                         Coin coin = (Coin) msg.obj;
                         int numberOfOhlcDataToLoad = 7 + toIntExact(now().toEpochDay() - now().minusMonths(1).toEpochDay());
@@ -176,12 +241,12 @@ public class CurrencyListActivity extends AppCompatActivity {
                             progressBar.setProgress(0, true);
                             progressBar.setMax(numberOfOhlcDataToLoad);
                             progressBar.setVisibility(VISIBLE);
-                            findViewById(id.noConnectionImg).setVisibility(shouldShowNoInternetPic() ? VISIBLE : INVISIBLE);
+//                            findViewById(id.noConnectionImg).setVisibility(shouldShowNoInternetPic() ? VISIBLE : INVISIBLE);
                         });
                         executer.execute(() -> {
                             ArrayList<CandleEntry> ohlcData1Month = coin.generateRandomOHLCData(
                                     numberOfOhlcDataToLoad - 7 // is number of days in last month
-                            ),ohlcData1Week = coin.generateRandomOHLCData(7);
+                            ), ohlcData1Week = coin.generateRandomOHLCData(7);
 
                             runOnUiThread(() -> {
                                 FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -218,6 +283,10 @@ public class CurrencyListActivity extends AppCompatActivity {
         });
     }
 
+    private void showCantConnectToInternetToast() {
+        Toast.makeText(this, "Cannot Connect To The Internet", LENGTH_LONG).show();
+    }
+
     private void setAllButtonEnabled(boolean enabled) {
         runOnUiThread(() -> {
             ((Button) findViewById(id.loadNext10Btn)).setEnabled(enabled);
@@ -226,7 +295,7 @@ public class CurrencyListActivity extends AppCompatActivity {
     }
 
     private boolean shouldShowNoInternetPic() {
-        return !isConnectedToInternet() && dataBaseHandler.getCoinCount() == 0;
+        return !isConnectedToInternet() && getInstance(this).getCoinCount() == 0;
     }
 
     @RequiresApi(api = N)
@@ -259,7 +328,7 @@ public class CurrencyListActivity extends AppCompatActivity {
     }
 
     public boolean canLoadFromCache() {
-        return !isConnectedToInternet() || dataBaseHandler.getCoinCount() != 0;
+        return !isConnectedToInternet() || getInstance(this).getCoinCount() != 0;
     }
 
 //    @RequiresApi(api = N)
@@ -273,9 +342,5 @@ public class CurrencyListActivity extends AppCompatActivity {
 
     public static int getProceedProgressBar() {
         return proceedProgressBar;
-    }
-
-    public static ThreadPoolExecutor getExecuter() {
-        return executer;
     }
 }

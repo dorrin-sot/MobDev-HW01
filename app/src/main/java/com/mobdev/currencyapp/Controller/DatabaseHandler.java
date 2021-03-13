@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.mobdev.currencyapp.Model.Coin;
 
+import java.util.LinkedList;
+
 public class DatabaseHandler extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 3;
@@ -63,7 +65,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_ID, coin.getId());
         values.put(KEY_NAME, coin.getName());
         values.put(KEY_SYM, coin.getSymbol());
-        values.put(KEY_RANK, 0);
+        values.put(KEY_RANK, coin.getRank());
         values.put(KEY_PRICE, coin.getCurrentPriceUSD());
         values.put(KEY_P_C_H, coin.getPercentChange1H());
         values.put(KEY_P_C_D, coin.getPercentChange1D());
@@ -73,11 +75,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         // Inserting Row
         db.insert(TABLE_COINS, null, values);
         //2nd argument is String containing nullColumnHack
-        db.close(); // Closing database connection
+//        db.close(); // Closing database connection
     }
 
     // code to get the single contact
-    public synchronized Coin getCoin(int id) {
+    public synchronized Coin getCoin(int id, int rank) {
         SQLiteDatabase db = getInstance(context).getReadableDatabase();
 
         Cursor cursor = db.query(TABLE_COINS, new String[] {
@@ -85,7 +87,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 new String[] { String.valueOf(id) }, null, null, null, null);
         if (cursor != null) {
             cursor.moveToFirst();
-            Coin coin = new Coin(cursor.getString(0), cursor.getString(1), id, Integer.parseInt(cursor.getString(2)), cursor.getString(7), Double.parseDouble(cursor.getString(3)), Double.parseDouble(cursor.getString(4)), Double.parseDouble(cursor.getString(5)), Double.parseDouble(cursor.getString(6)));
+            Coin coin = new Coin(cursor.getString(0), cursor.getString(1), id, rank, cursor.getString(7), Double.parseDouble(cursor.getString(3)), Double.parseDouble(cursor.getString(4)), Double.parseDouble(cursor.getString(5)), Double.parseDouble(cursor.getString(6)));
             return coin;
         }
         return null;
@@ -123,7 +125,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(KEY_NAME, coin.getName());
         values.put(KEY_SYM, coin.getSymbol());
-        values.put(KEY_RANK, 0);
+        values.put(KEY_RANK, coin.getRank());
         values.put(KEY_ID, coin.getId());
         values.put(KEY_PRICE, coin.getCurrentPriceUSD());
         values.put(KEY_P_C_H, coin.getPercentChange1H());
@@ -141,7 +143,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_COINS, KEY_ID + " = ?",
                 new String[] { String.valueOf(coin.getId()) });
-        db.close();
+//        db.close();
     }
 
     // Getting contacts Count
@@ -159,6 +161,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public boolean coinExists(int id) {
         SQLiteDatabase db = getInstance(context).getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM coins WHERE id=?", new String[]{String.valueOf(id)});
-        return cursor.moveToFirst();
+        boolean b = cursor.moveToFirst();
+        cursor.close();
+        return b;
+    }
+
+    public LinkedList<Integer> getAvailableIDs() {
+        LinkedList<Integer> avaIDs = new LinkedList<>();
+
+        SQLiteDatabase db = getInstance(context).getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT " + KEY_ID + " FROM " + TABLE_COINS, null);
+        if (cursor.moveToFirst()) do {
+            int id = cursor.getInt(0);
+            System.out.print(id + "  ");
+            avaIDs.addLast(id);
+        } while (cursor.moveToNext());
+
+        return avaIDs;
     }
 }

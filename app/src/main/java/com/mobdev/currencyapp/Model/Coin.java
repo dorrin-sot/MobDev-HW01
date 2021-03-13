@@ -21,7 +21,6 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 import static android.os.Build.VERSION_CODES.O;
-import static com.mobdev.currencyapp.View.CurrencyListActivity.dataBaseHandler;
 import static com.mobdev.currencyapp.View.CurrencyListActivity.getHandler;
 import static com.mobdev.currencyapp.View.CurrencyListActivity.getProceedProgressBar;
 import static java.lang.String.valueOf;
@@ -63,13 +62,9 @@ public class Coin {
         this.percentChange1W = percentChange1W;
     }
 
-    public static Coin getCoin(int id) {
-        Coin coin = constructCoin(id);
+    public static Coin getCoin(int id, int rank) {
+        Coin coin = constructCoin(id, rank);
         coinList.addLast(coin);
-        if (dataBaseHandler.coinExists(id))
-            dataBaseHandler.updateContact(coin);
-        else
-            dataBaseHandler.addCoin(coin);
         return coin;
     }
 
@@ -109,11 +104,10 @@ public class Coin {
     }
 
     @NotNull
-    private static Coin constructCoin(int id) {
+    private static Coin constructCoin(int id, int rank) {
         final String[] name = new String[1];
         final String[] symbol = new String[1];
         final String[] logoURL = {"https://s2.coinmarketcap.com/static/img/coins/64x64/" + id + ".png"};
-        final int[] rank = new int[1];
         final double[] currentPriceUSD = new double[1];
         final double[] percentChange1H = new double[1];
         final double[] percentChange1D = new double[1];
@@ -125,7 +119,6 @@ public class Coin {
         try {
             name[0] = data.getString("name");
             symbol[0] = data.getString("symbol");
-            rank[0] = id;
             JSONObject USD_converted = data.getJSONObject("quote").getJSONObject("USD");
             currentPriceUSD[0] = USD_converted.getDouble("price");
             percentChange1H[0] = USD_converted.getDouble("percent_change_1h");
@@ -138,10 +131,10 @@ public class Coin {
                 "id:" + id +
                         "\nname:" + name[0] +
                         "\nsymbol:" + symbol[0]
-                        + "\nrank:" + rank[0] + "\ncurrentprice:" + currentPriceUSD[0]
+                        + "\nrank:" + rank + "\ncurrentprice:" + currentPriceUSD[0]
                         + "\npercentcahnge1w:" + percentChange1W[0]
                         + "\nlogourl: " + logoURL[0]);
-        return new Coin(name[0], symbol[0], id, rank[0], logoURL[0], currentPriceUSD[0], percentChange1H[0], percentChange1D[0], percentChange1W[0]);
+        return new Coin(name[0], symbol[0], id, rank, logoURL[0], currentPriceUSD[0], percentChange1H[0], percentChange1D[0], percentChange1W[0]);
     }
 
     public static synchronized void clearCoinList() {
